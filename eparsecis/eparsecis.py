@@ -4,7 +4,7 @@ import logging
 
 from EPCPyYes.core.v1_2 import template_events
 from EPCPyYes.core.v1_2.events import Action
-from EPCPyYes.core.v1_2.events import Source, Destination
+from EPCPyYes.core.v1_2.events import Source, Destination, QuantityElement
 from EPCPyYes.core.v1_2.CBV.helpers import get_ilmd_enum_by_value
 from EPCPyYes.core.v1_2.CBV.instance_lot_master_data import \
     InstanceLotMasterDataAttribute
@@ -189,6 +189,8 @@ class FastIterParser(object):
                 self.parse_destination_list(epcis_event, child)
             elif child.tag == 'ilmd':
                 self.parse_ilmd(epcis_event, child)
+            elif child.tag == 'quantityList':
+                self.parse_quantity_list(epcis_event, child)
 
     def parse_source_list(self, epcis_event, source_list):
         for child in source_list:
@@ -212,7 +214,7 @@ class FastIterParser(object):
                     urn = value
             logger.debug('%s,%s', child.tag, child.text.strip())
             destination = Destination(urn, child.text.strip())
-            epcis_event.source_list.append(destination)
+            epcis_event.destination_list.append(destination)
             logger.debug('Added %s, %s to the destination_list.', urn,
                          child.text.strip())
 
@@ -235,16 +237,30 @@ class FastIterParser(object):
         :param quantity_list: The Element containing the quantity_list.
         :return: None
         '''
-        # for child in quantity_list:
-        #     if child.
-        pass
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if child.tag == 'quantityElement':
+                self.parse_quantity_element(epcis_event, child)
+
+    def parse_quantity_element(self, epcis_event, quantity_element):
+        qe = QuantityElement('')
+        for child in quantity_element:
+            if child.tag == 'epcClass':
+                qe.epc_class = child.text.strip()
+            elif child.tag == 'quantity':
+                qe.quantity = float(child.text.strip())
+            elif child.tag == 'uom':
+                qe.uom = child.text.strip()
+        logger.debug('Appending a quantity list element.')
+        epcis_event.quantity_list.append(qe)
 
     def handle_object_event(self, epcis_event):
         '''
         Implement this method to support the handing of EPCPyYes ObjectEvent
         template class instances.
         :param epcis_event: The EPCPyYes template_events.ObjectEvent instance.
-        :return: None 
+        :return: None
         '''
         if logger.getEffectiveLevel() == logging.DEBUG:
             # since render is being called here, avoiding sending to logger
@@ -269,7 +285,7 @@ class FastIterParser(object):
 
     def handle_transaction_event(self, epcis_event):
         '''
-        Implement this method to handle 
+        Implement this method to handle
         template_event.TransactionEvent instances as they are created ruding
         XML paring.
         :param epcis_event: The TransactionEvent instance.

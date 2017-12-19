@@ -1,2 +1,30 @@
+stages:
+    - test-python
+    - build-docs
+
+python3_5_unit_test:
+  image: seriallab/python3.5dev
+  stage: test-python
+  script:
+  - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR
+  - pip install tox
+  - tox
+  artifacts:
+    paths:
+      - htmlcov/
+
+pages:
+    image: seriallab/python3.5dev
+    stage: build-docs
+    script:
+    - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR
+    - pip install sphinx sphinx_rtd_theme pygments ipython
+    - make docs
+    - mv docs/_build/html/ public/
+    artifacts:
+        paths:
+        - public
+    only:
+      - master
 
 
