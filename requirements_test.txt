@@ -1,0 +1,11 @@
+coverage==4.4.1
+mock>=1.0.1
+flake8>=2.1.0
+tox>=1.7.0
+codecov>=2.0.0
+lxml
+# TODO - convert to non-ssh once the repo is public.
+-e git+ssh://git@gitlab.com/serial-lab/epcpyyes.git#egg=epcpyyes
+
+
+# Additional test requirements go here

@@ -1,0 +1,2 @@
+lxml
+-e git://gitlab.com/serial-lab/epcpyyes.git#egg=epcpyyes
