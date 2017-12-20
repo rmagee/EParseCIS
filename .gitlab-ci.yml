@@ -4,6 +4,7 @@ stages:
 
 before_script:
   - bash
+  - eval `ssh-agent -s`
   - mkdir -p ~/.ssh
   - ssh-add <(echo "$SERIALBOX_SSH_KEY")
   - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
