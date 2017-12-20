@@ -25,7 +25,6 @@ python3_5_unit_test:
   stage: test-python
   script:
   - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR
-  - apt-get install git-all
   - pip install tox
   - tox
   artifacts:
