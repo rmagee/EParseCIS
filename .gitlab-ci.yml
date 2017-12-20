@@ -4,18 +4,6 @@ stages:
 
 before_script:
   - bash
-  # install ssh-agent
-  - 'which ssh-agent || ( apt-get install openssh-client -y )'
-  - 'which bash || ( apt-get install bash -y )'
-  - apt-get install git-all -y
-  # run ssh-agent
-  - eval $(ssh-agent -s)
-  # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
-  # if you are running your tests locally you can set this variable
-  # by executing export SERIALBOX_SSH_KEY=$(cat ~/.ssh/[your private key file here])
-  # to create the environment variable
-  # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
-  # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
   - mkdir -p ~/.ssh
   - ssh-add <(echo "$SERIALBOX_SSH_KEY")
   - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
