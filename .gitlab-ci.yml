@@ -24,7 +24,7 @@ python3_5_unit_test:
   - coverage html
   artifacts:
     paths:
-      - htmlcov/
+      - tests/htmlcov/
 
 pages:
     image: seriallab/python3.5dev
