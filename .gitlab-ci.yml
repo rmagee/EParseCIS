@@ -17,7 +17,11 @@ python3_5_unit_test:
   - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR
   - git clone git@gitlab.com:serial-lab/EPCPyYes.git ./EPCPyYes
   - pip install -e ./EPCPyYes
-  - python setup.py test
+  - pip install coverage
+  - cd tests/
+  - coverage run -m unittest discover
+  - coverage report -m
+  - coverage html
   artifacts:
     paths:
       - htmlcov/

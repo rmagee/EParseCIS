@@ -3,6 +3,15 @@ EParseCIS
 ===============================
 
 
+A Pythonic Approach to Parsing EPCIS Data
+-----------------------------------------
+
+The EParseCIS python package utilizes the lxml python package along with
+the EPCPyYes EPCIS python package to enable the quick and easy parsing of
+EPCIS data from it's native format into python EPCPyYes class instances that
+can be quickly manipulated, inspected and serialized to other formats with
+minimal effort.
+
 .. image:: https://img.shields.io/pypi/v/eparsecis.svg
         :target: https://pypi.python.org/pypi/eparsecis
 
