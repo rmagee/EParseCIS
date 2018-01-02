@@ -12,32 +12,27 @@ EPCIS data from it's native format into python EPCPyYes class instances that
 can be quickly manipulated, inspected and serialized to other formats with
 minimal effort.
 
-.. image:: https://img.shields.io/pypi/v/eparsecis.svg
-        :target: https://pypi.python.org/pypi/eparsecis
+.. image:: https://gitlab.com/serial-lab/EParseCIS/badges/master/pipeline.svg
+        :target: https://gitlab.com/serial-lab/EParseCIS/commits/master
 
-.. image:: https://img.shields.io/travis/serial-lab/eparsecis.svg
-        :target: https://travis-ci.org/serial-lab/eparsecis
-
-.. image:: https://readthedocs.org/projects/eparsecis/badge/?version=latest
-        :target: https://eparsecis.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-.. image:: https://pyup.io/repos/github/serial-lab/eparsecis/shield.svg
-     :target: https://pyup.io/repos/github/serial-lab/eparsecis/
-     :alt: Updates
+.. image:: https://gitlab.com/serial-lab/EParseCIS/badges/master/coverage.svg
+        :target: https://gitlab.com/serial-lab/EParseCIS/commits/master
 
 
 Python lxml Parser for EPCIS Events
 
 
 * Free software: GNU General Public License v3
-* Documentation: https://eparsecis.readthedocs.io.
+* Documentation: https://serial-lab.gitlab.io/EParseCIS
 
 
 Features
 --------
 
-* TODO
+* Fast-forward lxml parsing of EPCIS xml-formatted data
+* Easy handling of EPCIS events as EPCPyYes python class instances as events are
+parsed.
+* Simplifies the building of EPCIS-enabled applications.
 
 Credits
 ---------
