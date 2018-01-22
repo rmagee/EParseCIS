@@ -30,3 +30,7 @@ class TestEparsecis(unittest.TestCase):
         parser = eparsecis.FastIterParser(
             os.path.join(curpath, 'data/epcis.xml'))
         parser.parse()
+
+
+if __name__ == '__main__':
+    unittest.main()

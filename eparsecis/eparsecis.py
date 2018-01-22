@@ -3,7 +3,7 @@ from lxml import etree
 import logging
 
 from EPCPyYes.core.v1_2 import template_events
-from EPCPyYes.core.v1_2.events import Action
+from EPCPyYes.core.v1_2.events import Action, BusinessTransaction
 from EPCPyYes.core.v1_2.events import Source, Destination, QuantityElement
 from EPCPyYes.core.v1_2.CBV.helpers import get_ilmd_enum_by_value
 from EPCPyYes.core.v1_2.CBV.instance_lot_master_data import \
@@ -58,6 +58,8 @@ class FastIterParser(object):
                 logger.debug('%s,%s', child.tag, child.text.strip())
                 if child.tag == 'eventTime':
                     oevent.event_time = child.text.strip()
+                elif child.tag == 'bizTransactionList':
+                    self.parse_biz_transaction_list(oevent, child)
                 elif child.tag == 'eventTimeZoneOffset':
                     oevent.event_timezone_offset = child.text.strip()
                 elif child.tag == 'recordTime':
@@ -93,6 +95,8 @@ class FastIterParser(object):
                     aevent.event_time = child.text.strip().strip()
                 elif child.tag == 'eventTimeZoneOffset':
                     aevent.event_timezone_offset = child.text.strip()
+                elif child.tag == 'bizTransactionList':
+                    self.parse_biz_transaction_list(aevent, child)
                 elif child.tag == 'recordTime':
                     aevent.record_time = child.text.strip().strip()
                 elif child.tag == 'parentID':
@@ -126,6 +130,8 @@ class FastIterParser(object):
                 logger.debug('%s,%s', child.tag, child.text.strip())
                 if child.tag == 'eventTime':
                     tevent.event_time = child.text.strip()
+                elif child.tag == 'bizTransactionList':
+                    self.parse_biz_transaction_list(tevent, child)
                 elif child.tag == 'eventTimeZoneOffset':
                     tevent.event_timezone_offset = child.text.strip()
                 elif child.tag == 'recordTime':
@@ -151,6 +157,24 @@ class FastIterParser(object):
             transaction_element.clear()
         if tevent:
             self.handle_transaction_event(tevent)
+
+    def parse_biz_transaction_list(self, event, list):
+        '''
+        Parses the business transaction list if supplied in a
+        given event and adds that info to the event.
+        :param event: The EPCIS event
+        :param list: The element containing the list.
+        '''
+        for child in list:
+            bt = BusinessTransaction(
+                child.text.strip()
+            )
+            for name, value in child.attrib.items():
+                logger.debug('%s,%s', name, value)
+                if name == 'type':
+                    bt.type = value
+            event.business_transaction_list.append(bt)
+
 
     def parse_epc_list(self, event, list):
         '''

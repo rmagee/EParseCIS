@@ -77,7 +77,19 @@
                 <eventTime>2015-04-22T15:34:31.500371+00:00</eventTime>
                 <recordTime>2015-04-22T15:34:31.500371+00:00</recordTime>
                 <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
+                <bizTransactionList>
+                    <bizTransaction type="urn:epcglobal:cbv:btt:po">
+                        urn:epc:id:gdti:0614141.06012.1234
+                    </bizTransaction>
+                </bizTransactionList>
                 <parentID>urn:epc:id:sgtin:305555.3555555.1</parentID>
+                <childEPCs>
+                    <epc>urn:epc:id:sgtin:305555.0555555.1</epc>
+                    <epc>urn:epc:id:sgtin:305555.0555555.2</epc>
+                    <epc>urn:epc:id:sgtin:305555.0555555.3</epc>
+                    <epc>urn:epc:id:sgtin:305555.0555555.4</epc>
+                    <epc>urn:epc:id:sgtin:305555.0555555.5</epc>
+                </childEPCs>
                 <action>ADD</action>
                 <bizStep>urn:epcglobal:cbv:bizstep:shipping</bizStep>
                 <disposition>urn:epcglobal:cbv:disp:in_transit</disposition>

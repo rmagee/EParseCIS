@@ -18,6 +18,7 @@ minimal effort.
 .. image:: https://gitlab.com/serial-lab/EParseCIS/badges/master/coverage.svg
         :target: https://gitlab.com/serial-lab/EParseCIS/commits/master
 
+Note: Line-by-line code-coverage files can be found in the build artifacts.
 
 Python lxml Parser for EPCIS Events
 
