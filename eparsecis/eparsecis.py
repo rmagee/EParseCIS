@@ -170,9 +170,9 @@ class EPCISParser(object):
         if event == 'start':
             tevent = template_events.TransformationEvent()
             for child in transformation_element:
-                if child.tag == 'inputEpcList':
+                if child.tag == 'inputEPCList':
                     self.parse_input_epc_list(tevent, child)
-                elif child.tag == 'outputEpcList':
+                elif child.tag == 'outputEPCList':
                     self.parse_output_epc_list(tevent, child)
                 elif child.tag == 'transformationID':
                     tevent.transformation_id = child.text.strip()
@@ -184,6 +184,10 @@ class EPCISParser(object):
                     self.parse_readpoint(tevent, child)
                 elif child.tag == 'bizLocation':
                     self.parse_biz_location(tevent, child)
+                elif child.tag == 'inputQuantityList':
+                    self.parse_input_quantity_list(tevent, child)
+                elif child.tag == 'outputQuantityList':
+                    self.parse_output_quantity_list(tevent, child)
                 elif child.tag == 'extension':
                     self.parse_extension(tevent, child)
         elif event == 'end':
@@ -278,8 +282,6 @@ class EPCISParser(object):
                 self.parse_ilmd(epcis_event, child)
             elif child.tag == 'quantityList':
                 self.parse_quantity_list(epcis_event, child)
-            elif child.tag == 'inputQuantityList':
-                self.parse_input_quantity_list(epcis_event, child)
 
     def parse_source_list(self, epcis_event, source_list):
         for child in source_list:
