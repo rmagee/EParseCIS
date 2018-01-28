@@ -48,6 +48,8 @@ class EPCISParser(object):
                 self.parse_aggregation_event_element(event, element)
             elif element.tag == 'TransactionEvent':
                 self.parse_transaction_event_element(event, element)
+            elif element.tag == 'TransformationEvent':
+                self.parse_transformation_event_element(event, element)
 
     def parse_object_event_element(self, event, object_element):
         oevent = None
@@ -158,6 +160,36 @@ class EPCISParser(object):
         if tevent:
             self.handle_transaction_event(tevent)
 
+    def parse_transformation_event_element(
+        self,
+        event,
+        transformation_element
+    ):
+        tevent = None
+        logger.debug('handling transaction event')
+        if event == 'start':
+            tevent = template_events.TransformationEvent()
+            for child in transformation_element:
+                if child.tag == 'inputEpcList':
+                    self.parse_input_epc_list(tevent, child)
+                elif child.tag == 'outputEpcList':
+                    self.parse_output_epc_list(tevent, child)
+                elif child.tag == 'transformationID':
+                    tevent.transformation_id = child.text.strip()
+                elif child.tag == 'bizStep':
+                    tevent.biz_step = child.text.strip()
+                elif child.tag == 'disposition':
+                    tevent.disposition = child.text.strip()
+                elif child.tag == 'readPoint':
+                    self.parse_readpoint(tevent, child)
+                elif child.tag == 'bizLocation':
+                    self.parse_biz_location(tevent, child)
+                elif child.tag == 'extension':
+                    self.parse_extension(tevent, child)
+        elif event == 'end':
+            logger.debug('clearing out the Element')
+            transformation_element.clear()
+
     def parse_biz_transaction_list(self, event, list):
         '''
         Parses the business transaction list if supplied in a
@@ -175,7 +207,6 @@ class EPCISParser(object):
                     bt.type = value
             event.business_transaction_list.append(bt)
 
-
     def parse_epc_list(self, event, list):
         '''
         Parses the epc list clearing each epc as it finds one to conserve
@@ -190,6 +221,38 @@ class EPCISParser(object):
             target = event.child_epcs
         for epc in list:
             target.append(epc.text)
+            logger.debug(epc.text)
+            epc.clear()
+
+    def parse_input_epc_list(self,
+                             event: template_events.TransformationEvent,
+                             list):
+        '''
+        Parses the epc input list of a TransformationEvent
+        clearing each epc as it finds one to conserve
+        memory if the list is massive.
+        :param event: The EPCIS event containing the list.
+        :param list: The list itself.
+        :return: None
+        '''
+        for epc in list:
+            event.input_epc_list.append(epc.text)
+            logger.debug(epc.text)
+            epc.clear()
+
+    def parse_output_epc_list(self,
+                              event: template_events.TransformationEvent,
+                              list):
+        '''
+        Parses the epc output list of a TransformationEvent
+        clearing each epc as it finds one to conserve
+        memory if the list is massive.
+        :param event: The EPCIS event containing the list.
+        :param list: The list itself.
+        :return: None
+        '''
+        for epc in list:
+            event.output_epc_list.append(epc.text)
             logger.debug(epc.text)
             epc.clear()
 
@@ -215,6 +278,8 @@ class EPCISParser(object):
                 self.parse_ilmd(epcis_event, child)
             elif child.tag == 'quantityList':
                 self.parse_quantity_list(epcis_event, child)
+            elif child.tag == 'inputQuantityList':
+                self.parse_input_quantity_list(epcis_event, child)
 
     def parse_source_list(self, epcis_event, source_list):
         for child in source_list:
@@ -266,6 +331,60 @@ class EPCISParser(object):
         for child in quantity_list:
             if child.tag == 'quantityElement':
                 self.parse_quantity_element(epcis_event, child)
+
+    def parse_input_quantity_list(self, epcis_event,
+                                  quantity_list):
+        '''
+        Takes a transformation event input quantity list
+        element as an input and parses it
+        into an EPCPyYes QuantityElement instance.
+        :param epcis_event: The EPCPyYes event instance that will contain
+        the parsed QuantityElement instance as an attribute.
+        :param quantity_list: The Element containing the quantity_list.
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if child.tag == 'quantityElement':
+                epcis_event.input_quantity_list.append(
+                    self.get_quantity_element(child)
+                )
+
+    def parse_output_quantity_list(self, epcis_event,
+                                  quantity_list):
+        '''
+        Takes a transformation event input quantity list
+        element as an output and parses it
+        into an EPCPyYes QuantityElement instance.
+        :param epcis_event: The EPCPyYes event instance that will contain
+        the parsed QuantityElement instance as an attribute.
+        :param quantity_list: The Element containing the quantity_list.
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if child.tag == 'quantityElement':
+                epcis_event.output_quantity_list.append(
+                    self.get_quantity_element(child)
+                )
+
+    def get_quantity_element(self, quantity_element):
+        '''
+        Parses and returns a quantity element.
+        :param quantity_element:
+        :return: An EPCPyYes QuantityElement.
+        '''
+        qe = QuantityElement('')
+        for child in quantity_element:
+            if child.tag == 'epcClass':
+                qe.epc_class = child.text.strip()
+            elif child.tag == 'quantity':
+                qe.quantity = float(child.text.strip())
+            elif child.tag == 'uom':
+                qe.uom = child.text.strip()
+        return qe
 
     def parse_quantity_element(self, epcis_event, quantity_element):
         qe = QuantityElement('')
@@ -320,4 +439,7 @@ class EPCISParser(object):
             # unless debug is set
             logger.debug(epcis_event.render())
         logger.debug('handle transaction event called...')
+        pass
+
+    def handle_transformation_event(self, epcis_event):
         pass
