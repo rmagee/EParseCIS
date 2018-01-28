@@ -14,7 +14,7 @@ from eparsecis.elements import EPCPyYesElement
 logger = logging.getLogger()
 
 
-class FastIterParser(object):
+class EPCISParser(object):
     '''
     Parses EPCIS XML from a stream and serializes each EPCIS Event
     in a given document into a serialized EPCPyYes event object.
@@ -22,7 +22,7 @@ class FastIterParser(object):
 
     def __init__(self, stream):
         '''
-        Initialize a new FastIterParser with a stream to be
+        Initialize a new EPCISParser with a stream to be
         parsed.
         :param stream: The stream containing the EPCIS XML to be parsed.
         '''
@@ -138,7 +138,7 @@ class FastIterParser(object):
                     tevent.record_time = child.text.strip()
                 elif child.tag == 'parentID':
                     tevent.parent_id = child.text.strip()
-                elif child.tag == 'childEPCs':
+                elif child.tag == 'epcList':
                     self.parse_epc_list(tevent, child)
                 elif child.tag == 'action':
                     tevent.action = Action(child.text.strip())

@@ -55,7 +55,7 @@ etc.
 
     import io
     from eparsecis import eparsecis
-    
+
     test_data = io.BytesIO('''
     <epcis:EPCISDocument
         xmlns:epcis="urn:epcglobal:epcis:xsd:1"
@@ -184,9 +184,9 @@ etc.
         </EPCISBody>
     </epcis:EPCISDocument>
     '''.encode('utf-8'))
-    
+
     #load the data into the parser
-    parser = eparsecis.FastIterParser(test_data)
+    parser = eparsecis.EPCISParser(test_data)
     parser.parse()
 
 Loading EPCIS Data From a File
@@ -199,11 +199,11 @@ The following illustrates loading an EPCIS XML structure from a file.
     import os
     from eparsecis import eparsecis
     curpath = os.path.split(os.getcwd())[0]
-    parser = eparsecis.FastIterParser(
+    parser = eparsecis.EPCISParser(
         os.path.join(curpath, './tests/data/epcis.xml'))
     parser.parse()
 
-Overriding the Base eparsecis.FastIterParser Class
+Overriding the Base eparsecis.EPCISParser Class
 ==================================================
 
 The EParseCIS package provides, essentially, a single class instance
@@ -239,27 +239,27 @@ rather than tinkering with the protocols involved.
     import os
     import logging
     from eparsecis import eparsecis
-    
-    class MyParser(eparsecis.FastIterParser):
+
+    class MyParser(eparsecis.EPCISParser):
         def handle_object_event(self, epcis_event):
             # for example, access the epc list
-            print("EPC List from the Object Event: %s\r\n" % 
+            print("EPC List from the Object Event: %s\r\n" %
                   epcis_event.epc_list)
-    
+
         def handle_aggregation_event(self, epcis_event):
             # for example, inspect the biz_location
-            print("Aggregation Event Biz Location: %s\r\n" % 
+            print("Aggregation Event Biz Location: %s\r\n" %
                   epcis_event.biz_location)
-    
+
         def handle_transaction_event(self, epcis_event):
             # get the possessing party
             for source in epcis_event.source_list:
                 if source.type == \
                 "urn:epcglobal:cbv:sdt:possessing_party":
-                    print("Transaction Event: Possessing Party: %s" 
+                    print("Transaction Event: Possessing Party: %s"
                           % source.source)
-            
-    
+
+
     curpath = os.path.split(os.getcwd())[0]
     parser = MyParser(
         os.path.join(curpath, './tests/data/epcis.xml'))
@@ -269,8 +269,8 @@ rather than tinkering with the protocols involved.
 .. parsed-literal::
 
     EPC List from the Object Event: ['urn:epc:id:sgtin:305555.0555555.1', 'urn:epc:id:sgtin:305555.0555555.2', 'urn:epc:id:sgtin:305555.0555555.3', 'urn:epc:id:sgtin:305555.0555555.4', 'urn:epc:id:sgtin:305555.0555555.5']
-    
+
     Aggregation Event Biz Location: urn:epc:id:sgln:305555.123456.0
-    
+
     Transaction Event: Possessing Party: urn:epc:id:sgln:305555.123456.0
 

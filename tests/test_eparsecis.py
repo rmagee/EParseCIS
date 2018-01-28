@@ -27,7 +27,7 @@ class TestEparsecis(unittest.TestCase):
 
     def test_epcis_file(self):
         curpath = os.path.dirname(__file__)
-        parser = eparsecis.FastIterParser(
+        parser = eparsecis.EPCISParser(
             os.path.join(curpath, 'data/epcis.xml'))
         parser.parse()
 
