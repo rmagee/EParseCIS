@@ -1,4 +1,20 @@
 # -*- coding: utf-8 -*-
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2018 SerialLab, LLC.  All rights reserved.
+
 from lxml import etree
 import logging
 
@@ -170,7 +186,17 @@ class EPCISParser(object):
         if event == 'start':
             tevent = template_events.TransformationEvent()
             for child in transformation_element:
-                if child.tag == 'inputEPCList':
+                if child.tag == 'eventTime':
+                    tevent.event_time = child.text.strip()
+                elif child.tag == 'eventTimeZoneOffset':
+                    tevent.event_timezone_offset = child.text.strip()
+                elif child.tag == 'recordTime':
+                    tevent.record_time = child.text.strip()
+                elif child.tag == 'bizTransactionList':
+                    self.parse_biz_transaction_list(tevent, child)
+                elif child.tag == 'eventTimeZoneOffset':
+                    tevent.event_timezone_offset = child.text.strip()
+                elif child.tag == 'inputEPCList':
                     self.parse_input_epc_list(tevent, child)
                 elif child.tag == 'outputEPCList':
                     self.parse_output_epc_list(tevent, child)
@@ -188,11 +214,17 @@ class EPCISParser(object):
                     self.parse_input_quantity_list(tevent, child)
                 elif child.tag == 'outputQuantityList':
                     self.parse_output_quantity_list(tevent, child)
-                elif child.tag == 'extension':
-                    self.parse_extension(tevent, child)
+                elif child.tag == 'ilmd':
+                    self.parse_ilmd(tevent, child)
+                elif child.tag == 'sourceList':
+                    self.parse_source_list(tevent, child)
+                elif child.tag == 'destinationList':
+                    self.parse_destination_list(tevent, child)
         elif event == 'end':
             logger.debug('clearing out the Element')
             transformation_element.clear()
+        if tevent:
+            self.handle_transformation_event(tevent)
 
     def parse_biz_transaction_list(self, event, list):
         '''
@@ -282,6 +314,8 @@ class EPCISParser(object):
                 self.parse_ilmd(epcis_event, child)
             elif child.tag == 'quantityList':
                 self.parse_quantity_list(epcis_event, child)
+            elif child.tag == 'childQuantityList':
+                self.parse_child_quantity_list(epcis_event, child)
 
     def parse_source_list(self, epcis_event, source_list):
         for child in source_list:
@@ -334,6 +368,23 @@ class EPCISParser(object):
             if child.tag == 'quantityElement':
                 self.parse_quantity_element(epcis_event, child)
 
+    def parse_child_quantity_list(self, epcis_event, quantity_list):
+        '''
+        Takes a child quantity list element as an input and parses it
+        into an EPCPyYes QuantityElement instance.
+        :param epcis_event: The EPCPyYes event instance that will contain
+        the parsed QuantityElement instance as an attribute.
+        :param quantity_list: The Element containing the quantity_list.
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if child.tag == 'quantityElement':
+                epcis_event.child_quantity_list.append(
+                    self.get_quantity_element(child)
+                )
+
     def parse_input_quantity_list(self, epcis_event,
                                   quantity_list):
         '''
@@ -354,7 +405,7 @@ class EPCISParser(object):
                 )
 
     def parse_output_quantity_list(self, epcis_event,
-                                  quantity_list):
+                                   quantity_list):
         '''
         Takes a transformation event input quantity list
         element as an output and parses it
@@ -400,7 +451,7 @@ class EPCISParser(object):
         logger.debug('Appending a quantity list element.')
         epcis_event.quantity_list.append(qe)
 
-    def handle_object_event(self, epcis_event):
+    def handle_object_event(self, epcis_event: template_events.ObjectEvent):
         '''
         Implement this method to support the handing of EPCPyYes ObjectEvent
         template class instances.
@@ -414,7 +465,10 @@ class EPCISParser(object):
         logger.debug('handle object event called...')
         pass
 
-    def handle_aggregation_event(self, epcis_event):
+    def handle_aggregation_event(
+        self,
+        epcis_event: template_events.AggregationEvent
+    ):
         '''
         Implement this method to handle template_event.AggregationEvent
         instances as they are created during XML parsing.
@@ -428,10 +482,13 @@ class EPCISParser(object):
         logger.debug('handle aggregation event called...')
         pass
 
-    def handle_transaction_event(self, epcis_event):
+    def handle_transaction_event(
+        self,
+        epcis_event: template_events.TransactionEvent
+    ):
         '''
         Implement this method to handle
-        template_event.TransactionEvent instances as they are created ruding
+        template_event.TransactionEvent instances as they are created during
         XML paring.
         :param epcis_event: The TransactionEvent instance.
         :return: None
@@ -443,5 +500,20 @@ class EPCISParser(object):
         logger.debug('handle transaction event called...')
         pass
 
-    def handle_transformation_event(self, epcis_event):
+    def handle_transformation_event(
+        self,
+        epcis_event: template_events.TransformationEvent
+    ):
+        '''
+        Implement this method to handle any template_event.TransformationEvent
+        instaces as the are created during the parsing process.
+
+        :param epcis_event: An EPCPyYes TransformationEvent
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            # since render is being called here, avoiding sending to logger
+            # unless debug is set
+            logger.debug(epcis_event.render())
+        logger.debug('handle transaction event called...')
         pass
