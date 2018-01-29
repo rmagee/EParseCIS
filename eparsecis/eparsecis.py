@@ -305,17 +305,26 @@ class EPCISParser(object):
                 logger.debug('%s,%s', child.tag, child.text.strip())
 
     def parse_extension(self, epcis_event, extension):
-        for child in extension:
-            if child.tag == 'sourceList':
-                self.parse_source_list(epcis_event, child)
-            elif child.tag == 'destinationList':
-                self.parse_destination_list(epcis_event, child)
-            elif child.tag == 'ilmd':
-                self.parse_ilmd(epcis_event, child)
-            elif child.tag == 'quantityList':
-                self.parse_quantity_list(epcis_event, child)
-            elif child.tag == 'childQuantityList':
-                self.parse_child_quantity_list(epcis_event, child)
+        '''
+        Called when the extension is encountered for each event.
+        If you need to process custom extensions, override this function.
+        :param epcis_event: The inbound event
+        :param extension: The extension lxml element.
+        :return: None
+        '''
+        # Transformation events don't have standardized extensions...
+        if not isinstance(epcis_event, template_events.TransformationEvent):
+            for child in extension:
+                if child.tag == 'sourceList':
+                    self.parse_source_list(epcis_event, child)
+                elif child.tag == 'destinationList':
+                    self.parse_destination_list(epcis_event, child)
+                elif child.tag == 'ilmd':
+                    self.parse_ilmd(epcis_event, child)
+                elif child.tag == 'quantityList':
+                    self.parse_quantity_list(epcis_event, child)
+                elif child.tag == 'childQuantityList':
+                    self.parse_child_quantity_list(epcis_event, child)
 
     def parse_source_list(self, epcis_event, source_list):
         for child in source_list:
