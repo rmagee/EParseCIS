@@ -85,7 +85,7 @@ class EPCISParser(object):
                 elif child.tag == 'epcList':
                     self.parse_epc_list(oevent, child)
                 elif child.tag == 'action':
-                    oevent.action = Action(child.text.strip())
+                    oevent.action = child.text.strip()
                 elif child.tag == 'bizStep':
                     oevent.biz_step = child.text.strip()
                 elif child.tag == 'disposition':
@@ -122,7 +122,7 @@ class EPCISParser(object):
                 elif child.tag == 'childEPCs':
                     self.parse_epc_list(aevent, child)
                 elif child.tag == 'action':
-                    aevent.action = Action(child.text.strip().strip())
+                    aevent.action = child.text.strip().strip()
                 elif child.tag == 'bizStep':
                     aevent.biz_step = child.text.strip().strip()
                 elif child.tag == 'disposition':
@@ -159,7 +159,7 @@ class EPCISParser(object):
                 elif child.tag == 'epcList':
                     self.parse_epc_list(tevent, child)
                 elif child.tag == 'action':
-                    tevent.action = Action(child.text.strip())
+                    tevent.action = child.text.strip()
                 elif child.tag == 'bizStep':
                     tevent.biz_step = child.text.strip()
                 elif child.tag == 'disposition':
