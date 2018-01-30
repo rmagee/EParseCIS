@@ -18,7 +18,6 @@ python3_5_unit_test:
   - git clone git@gitlab.com:serial-lab/EPCPyYes.git ../EPCPyYes
   - pip install -e ../EPCPyYes
   - pip install coverage
-  - cd tests/
   - coverage run -m unittest discover
   - coverage report -m
   - coverage html
