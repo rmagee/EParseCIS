@@ -3,7 +3,7 @@
 
 from setuptools import setup
 
-with open('README.rst') as readme_file:
+with open('README.md') as readme_file:
     readme = readme_file.read()
 
 with open('HISTORY.rst') as history_file:
@@ -21,11 +21,11 @@ test_requirements = [
 setup(
     name='eparsecis',
     version='0.1.0',
-    description="Python lxml parsing for EPCIS Events",
+    description="Python lxml parsing for EPCIS Events.",
     long_description=readme + '\n\n' + history,
     author="Serial Lab, LLC",
     author_email='slab@serial-lab.com',
-    url='https://github.com/serial-lab/eparsecis',
+    url='https://gitlab.com/serial-lab/eparsecis',
     packages=[
         'eparsecis',
     ],

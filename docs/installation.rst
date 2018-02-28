@@ -14,7 +14,7 @@ To install EParseCIS, run this command in your terminal:
 
     $ pip install eparsecis
 
-This is the preferred method to install EParseCIS, as it will always install the most recent stable release. 
+This is the preferred method to install EParseCIS, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for EParseCIS can be downloaded from the `Github repo`_.
+The sources for EParseCIS can be downloaded from the `Gitlab repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/serial-lab/eparsecis
+    $ git clone git://gitlab.com/serial-lab/eparsecis
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/serial-lab/eparsecis/tarball/master
+    $ curl  -OL https://gitlab.com/serial-lab/EParseCIS/repository/master/archive.tar.gz
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/serial-lab/eparsecis
-.. _tarball: https://github.com/serial-lab/eparsecis/tarball/master
+.. _Gitlab repo: https://gitlab.com/serial-lab/eparsecis
+.. _tarball: https://gitlab.com/serial-lab/EParseCIS/repository/master/archive.tar.gz
