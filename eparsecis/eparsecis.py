@@ -24,7 +24,8 @@ from EPCPyYes.core.v1_2.events import Source, Destination, QuantityElement
 from EPCPyYes.core.v1_2.CBV.helpers import get_ilmd_enum_by_value
 from EPCPyYes.core.v1_2.CBV.instance_lot_master_data import \
     InstanceLotMasterDataAttribute
-
+from EPCPyYes.core.SBDH import sbdh, template_sbdh
+from eparsecis.namespace_helpers import SBDHNamespaceHelper
 from eparsecis.elements import EPCPyYesElement
 
 logger = logging.getLogger()
@@ -36,13 +37,29 @@ class EPCISParser(object):
     in a given document into a serialized EPCPyYes event object.
     '''
 
-    def __init__(self, stream):
+    def __init__(
+        self,
+                 stream,
+        header_namespace='http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader'
+    ):
         '''
         Initialize a new EPCISParser with a stream to be
         parsed.
         :param stream: The stream containing the EPCIS XML to be parsed.
+        :param header_namespace: The namespace prefix for the standard
+        business document header elements (if any).
         '''
         self._stream = stream
+        self._header_namespace = header_namespace
+        self._sbdh_helper = SBDHNamespaceHelper(header_namespace)
+
+    @property
+    def header_namespace(self):
+        return self._header_namespace
+
+    @header_namespace.setter
+    def header_namespace(self, value):
+        self._header_namespace = value
 
     @property
     def stream(self):
@@ -58,7 +75,9 @@ class EPCISParser(object):
         epcis = etree.iterparse(self.stream, events=('start', 'end'))
         epcis.set_element_class_lookup(parser_lookup)
         for event, element in epcis:
-            if element.tag == 'ObjectEvent':
+            if element.tag == 'EPCISHeader':
+                self.parse_epcis_header(event, element)
+            elif element.tag == 'ObjectEvent':
                 self.parse_object_event_element(event, element)
             elif element.tag == 'AggregationEvent':
                 self.parse_aggregation_event_element(event, element)
@@ -66,6 +85,123 @@ class EPCISParser(object):
                 self.parse_transaction_event_element(event, element)
             elif element.tag == 'TransformationEvent':
                 self.parse_transformation_event_element(event, element)
+
+    def parse_epcis_header(self, event, header_element):
+        '''
+        Parses the EPCIS header if one is found.
+        :param event: The lxml/etree event.
+        :param header_element: The XML etree/lxml element.
+        :return: None
+        '''
+        logger.debug('handling the header')
+        if event == 'start':
+            for child in header_element:
+                if child.tag == self._sbdh_helper.sbdh:
+                    self.parse_sbdh(child)
+            else:
+                self.parse_header_info(event, child)
+
+    def parse_sbdh(self, sbdh_element):
+        '''
+        Parses out the Standard Business Document Header element.
+        :param event: The event.  Should always be 'start'
+        :param sbdh_element: The element.
+        :return: None
+        '''
+        header = template_sbdh.StandardBusinessDocumentHeader()
+        header.partners = []
+        logger.debug('Found an SBDH element...parsing...')
+        for child in sbdh_element:
+            if child.tag == self._sbdh_helper.header_version:
+                header.header_version = child.text.strip()
+            elif child.tag == self._sbdh_helper.sender:
+                header.partners.append(
+                    self.parse_partner(sbdh.PartnerType.SENDER, child)
+                )
+            elif child.tag == self._sbdh_helper.receiver:
+                header.partners.append(
+                    self.parse_partner(sbdh.PartnerType.RECEIVER, child)
+                )
+            elif child.tag == self._sbdh_helper.document_identification:
+                header.document_identification = \
+                    self.parse_document_identification(child)
+        print(header.render())
+
+    def parse_partner(self, partner_type: sbdh.PartnerType, partner_element):
+        '''
+        Parses any partner elements into a sbdh.Partner class instance.
+        :param partner_type: The type of partner (Sender or Receiver)
+        :return: A sbdh.Partner class instance.
+        '''
+        partner = sbdh.Partner(partner_type=partner_type)
+        for child in partner_element:
+            if child.tag == self._sbdh_helper.identifier:
+                partner.partner_id = self.create_partner_identification(child)
+            elif child.tag == self._sbdh_helper.contact_information:
+                self.parse_contact_information(child, partner)
+        return partner
+
+    def parse_contact_information(self, contact_info_element, partner):
+        '''
+        Adds any contact info to a partner class instance.
+        '''
+        for child in contact_info_element:
+            if child.tag == self._sbdh_helper.contact:
+                partner.contact = child.text.strip()
+            elif child.tag == self._sbdh_helper.email_address:
+                partner.email_address = child.text.strip()
+            elif child.tag == self._sbdh_helper.fax_number:
+                partner.fax_number = child.text.strip()
+            elif child.tag == self._sbdh_helper.telephone_number:
+                partner.telephone_number = child.text.strip()
+            elif child.tag == self._sbdh_helper.contact_type_identifier:
+                partner.contact_type_identifier = child.text.strip()
+
+    def create_partner_identification(self, partner_id_element):
+        '''
+        Creates and returns an EPCPyYes sbdh.PartnerIdentification
+        class instance.
+        :param partner_id_element: The element to parse.
+        :return: an EPCPyYes PartnerIdentification instance.
+        '''
+
+        authority = partner_id_element.attrib.get('Authority', None)
+        value = partner_id_element.text.strip()
+        return sbdh.PartnerIdentification(authority,value)
+
+    def parse_document_identification(self, element):
+        '''
+        Parses the document identification node of the SBDH
+        :param element: The document identification element
+        :return: A sbdh.DocumentIdentification class instance (EPCPyYes).
+        '''
+        logger.debug('parsing the document identification element')
+        did = sbdh.DocumentIdentification()
+        for child in element:
+            if child.tag == self._sbdh_helper.standard:
+                did.standard = child.text.strip()
+            elif child.tag == self._sbdh_helper.type_version:
+                did.type_version = child.text.strip()
+            elif child.tag == self._sbdh_helper.instance_identifier:
+                did.instance_identifier = child.text.strip()
+            elif child.tag == self._sbdh_helper.document_type:
+                did.document_type = child.text.strip()
+            elif child.tag == self._sbdh_helper.multiple_type:
+                did.multiple_type = child.text.strip()
+            elif child.tag == self._sbdh_helper._creation_date_and_time:
+                did.creation_date_and_time = child.text.strip()
+        return did
+
+
+    def parse_header_info(self, event, header_element):
+        '''
+        Override this method to handle any extra header info.
+        :param header_element: The header element that falls outside
+        the standard SBDH.
+        :return: None
+        '''
+        logger.debug('parse_header_info. element: %s', header_element.tag)
+        pass
 
     def parse_object_event_element(self, event, object_element):
         oevent = None

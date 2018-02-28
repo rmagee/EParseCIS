@@ -1,12 +1,53 @@
 <epcis:EPCISDocument
     xmlns:epcis="urn:epcglobal:epcis:xsd:1"
     xmlns:cbvmd="urn:epcglobal:cbv:mda"
-    schemaVersion="1.2" creationDate="2018-01-22T20:34:00.706115">
+    xmlns:sbdh="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
+    schemaVersion="1.2" creationDate="2018-02-27T21:52:16.416129">
+    <EPCISHeader>
+        <sbdh:StandardBusinessDocumentHeader>
+            <sbdh:HeaderVersion>1.0</sbdh:HeaderVersion>
+            <sbdh:Sender>
+                <sbdh:Identifier Authority="SGLN">
+                    urn:epc:id:sgln:039999.999999.0
+                </sbdh:Identifier>
+                <sbdh:ContactInformation>
+                    <sbdh:Contact>John Smith</sbdh:Contact>
+                    <sbdh:EmailAddress>john.smith@pharma.local
+                    </sbdh:EmailAddress>
+                    <sbdh:TelephoneNumber>555-555-5555</sbdh:TelephoneNumber>
+                    <sbdh:ContactTypeIdentifier>Seller
+                    </sbdh:ContactTypeIdentifier>
+                </sbdh:ContactInformation>
+            </sbdh:Sender>
+            <sbdh:Receiver>
+                <sbdh:Identifier Authority="SGLN">
+                    urn:epc:id:sgln:039999.111111.0
+                </sbdh:Identifier>
+                <sbdh:ContactInformation>
+                    <sbdh:Contact>Joe Blow</sbdh:Contact>
+                    <sbdh:EmailAddress>joe.blow@distributor.local
+                    </sbdh:EmailAddress>
+                    <sbdh:TelephoneNumber>555-555-2222</sbdh:TelephoneNumber>
+                    <sbdh:ContactTypeIdentifier>Buyer
+                    </sbdh:ContactTypeIdentifier>
+                </sbdh:ContactInformation>
+            </sbdh:Receiver>
+            <sbdh:DocumentIdentification>
+                <sbdh:Standard>EPCglobal</sbdh:Standard>
+                <sbdh:TypeVersion>1.0</sbdh:TypeVersion>
+                <sbdh:InstanceIdentifier>55abd29c-010e-489e-af31-8f095b48dff9
+                </sbdh:InstanceIdentifier>
+                <sbdh:Type>Events</sbdh:Type>
+                <sbdh:CreationDateAndTime>2018-02-27T18:22:09.549608
+                </sbdh:CreationDateAndTime>
+            </sbdh:DocumentIdentification>
+        </sbdh:StandardBusinessDocumentHeader>
+    </EPCISHeader>
     <EPCISBody>
         <EventList>
             <ObjectEvent>
-                <eventTime>2018-01-22T22:51:49.294565+00:00</eventTime>
-                <recordTime>2018-01-22T22:51:49.294565+00:00</recordTime>
+                <eventTime>2018-02-28T01:22:09.146351+00:00</eventTime>
+                <recordTime>2018-02-28T01:22:09.146351+00:00</recordTime>
                 <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
                 <epcList>
                     <epc>urn:epc:id:sgtin:305555.0555555.1</epc>
@@ -24,11 +65,6 @@
                 <bizLocation>
                     <id>urn:epc:id:sgln:305555.123456.0</id>
                 </bizLocation>
-                <bizTransactionList>
-                    <bizTransaction type="urn:epcglobal:cbv:btt:po">
-                        urn:epc:id:gdti:0614141.06012.1234
-                    </bizTransaction>
-                </bizTransactionList>
                 <extension>
                     <sourceList>
                         <source type="urn:epcglobal:cbv:sdt:possessing_party">
@@ -56,8 +92,8 @@
                 </extension>
             </ObjectEvent>
             <AggregationEvent>
-                <eventTime>2018-01-22T22:51:49.294565+00:00</eventTime>
-                <recordTime>2018-01-22T22:51:49.294565+00:00</recordTime>
+                <eventTime>2018-02-28T01:22:09.146351+00:00</eventTime>
+                <recordTime>2018-02-28T01:22:09.146351+00:00</recordTime>
                 <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
                 <parentID>urn:epc:id:sgtin:305555.3555555.1</parentID>
                 <childEPCs>
@@ -77,48 +113,10 @@
                 <bizLocation>
                     <id>urn:epc:id:sgln:305555.123456.0</id>
                 </bizLocation>
-                <bizTransactionList>
-                    <bizTransaction type="urn:epcglobal:cbv:btt:po">
-                        urn:epc:id:gdti:0614141.06012.1234
-                    </bizTransaction>
-                </bizTransactionList>
-                <extension>
-                    <childQuantityList>
-                        <quantityElement>
-                            <epcClass>urn:epc:idpat:sgtin:305555.0555555.*
-                            </epcClass>
-                            <quantity>5</quantity>
-                        </quantityElement>
-                        <quantityElement>
-                            <epcClass>urn:epc:idpat:sgtin:305555.0555555.*
-                            </epcClass>
-                            <quantity>14.5</quantity>
-                            <uom>LB</uom>
-                        </quantityElement>
-                    </childQuantityList>
-                    <sourceList>
-                        <source type="urn:epcglobal:cbv:sdt:possessing_party">
-                            urn:epc:id:sgln:305555.123456.0
-                        </source>
-                        <source type="urn:epcglobal:cbv:sdt:location">
-                            urn:epc:id:sgln:305555.123456.12
-                        </source>
-                    </sourceList>
-                    <destinationList>
-                        <destination
-                            type="urn:epcglobal:cbv:sdt:owning_party">
-                            urn:epc:id:sgln:309999.111111.0
-                        </destination>
-                        <destination
-                            type="urn:epcglobal:cbv:sdt:location">
-                            urn:epc:id:sgln:309999.111111.233
-                        </destination>
-                    </destinationList>
-                </extension>
             </AggregationEvent>
             <TransactionEvent>
-                <eventTime>2018-01-22T22:51:49.294565+00:00</eventTime>
-                <recordTime>2018-01-22T22:51:49.294565+00:00</recordTime>
+                <eventTime>2018-02-28T01:22:09.146351+00:00</eventTime>
+                <recordTime>2018-02-28T01:22:09.146351+00:00</recordTime>
                 <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
                 <bizTransactionList>
                     <bizTransaction type="urn:epcglobal:cbv:btt:po">
@@ -126,13 +124,6 @@
                     </bizTransaction>
                 </bizTransactionList>
                 <parentID>urn:epc:id:sgtin:305555.3555555.1</parentID>
-                <epcList>
-                    <epc>urn:epc:id:sgtin:305555.0555555.1</epc>
-                    <epc>urn:epc:id:sgtin:305555.0555555.2</epc>
-                    <epc>urn:epc:id:sgtin:305555.0555555.3</epc>
-                    <epc>urn:epc:id:sgtin:305555.0555555.4</epc>
-                    <epc>urn:epc:id:sgtin:305555.0555555.5</epc>
-                </epcList>
                 <action>ADD</action>
                 <bizStep>urn:epcglobal:cbv:bizstep:shipping</bizStep>
                 <disposition>urn:epcglobal:cbv:disp:in_transit</disposition>
@@ -178,10 +169,27 @@
             </TransactionEvent>
             <extension>
                 <TransformationEvent>
-                    <eventTime>2018-01-22T22:51:49.294565+00:00</eventTime>
-                    <recordTime>2018-01-22T22:51:49.294565+00:00</recordTime>
+                    <eventTime>2018-02-28T01:22:09.146351+00:00</eventTime>
+                    <recordTime>2018-02-28T01:22:09.146351+00:00</recordTime>
                     <eventTimeZoneOffset>+00:00</eventTimeZoneOffset>
-                    <transformationID>123434089938</transformationID>
+                    <baseExtension>
+                        <eventID>a703cd40-37d9-4312-a79a-4e53b877f242</eventID>
+                        <errorDeclaration>
+                            <declarationTime>2018-02-28T01:22:09.436021
+                            </declarationTime>
+                            <reason>
+                                urn:epcglobal:cbv:er:incorrect_data
+                            </reason>
+                            <correctiveEventIDs>
+                                <correctiveEventID>
+                                    3d63af99-6dd7-46db-ad9c-82a706e67eaa
+                                </correctiveEventID>
+                                <correctiveEventID>
+                                    3c86edb0-d57c-48f7-92f6-b0f37c8d7e16
+                                </correctiveEventID>
+                            </correctiveEventIDs>
+                        </errorDeclaration>
+                    </baseExtension>
                     <inputEPCList>
                         <epc>urn:epc:id:sgtin:305555.0555555.2000</epc>
                         <epc>urn:epc:id:sgtin:305555.0555555.2001</epc>
@@ -337,11 +345,6 @@
                             urn:epc:id:gdti:0614141.06012.1234
                         </bizTransaction>
                     </bizTransactionList>
-                    <ilmd>
-                        <cbvmd:itemExpirationDate>2015-12-31
-                        </cbvmd:itemExpirationDate>
-                        <cbvmd:lotNumber>DL232</cbvmd:lotNumber>
-                    </ilmd>
                     <sourceList>
                         <source type="urn:epcglobal:cbv:sdt:possessing_party">
                             urn:epc:id:sgln:305555.123456.0
@@ -360,6 +363,11 @@
                             urn:epc:id:sgln:309999.111111.233
                         </destination>
                     </destinationList>
+                    <ilmd>
+                        <cbvmd:itemExpirationDate>2015-12-31
+                        </cbvmd:itemExpirationDate>
+                        <cbvmd:lotNumber>DL232</cbvmd:lotNumber>
+                    </ilmd>
                 </TransformationEvent>
             </extension>
         </EventList>
