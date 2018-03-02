@@ -39,7 +39,7 @@ class EPCISParser(object):
 
     def __init__(
         self,
-                 stream,
+        stream,
         header_namespace='http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader'
     ):
         '''
@@ -100,6 +100,9 @@ class EPCISParser(object):
                     self.parse_sbdh(child)
             else:
                 self.parse_header_info(event, child)
+        elif event == 'end':
+            logger.debug('Clearing out the header element.')
+            header_element.clear()
 
     def parse_sbdh(self, sbdh_element):
         '''
@@ -125,7 +128,7 @@ class EPCISParser(object):
             elif child.tag == self._sbdh_helper.document_identification:
                 header.document_identification = \
                     self.parse_document_identification(child)
-        print(header.render())
+        self.handle_sbdh(header)
 
     def parse_partner(self, partner_type: sbdh.PartnerType, partner_element):
         '''
@@ -167,7 +170,7 @@ class EPCISParser(object):
 
         authority = partner_id_element.attrib.get('Authority', None)
         value = partner_id_element.text.strip()
-        return sbdh.PartnerIdentification(authority,value)
+        return sbdh.PartnerIdentification(authority, value)
 
     def parse_document_identification(self, element):
         '''
@@ -191,7 +194,6 @@ class EPCISParser(object):
             elif child.tag == self._sbdh_helper._creation_date_and_time:
                 did.creation_date_and_time = child.text.strip()
         return did
-
 
     def parse_header_info(self, event, header_element):
         '''
@@ -596,6 +598,17 @@ class EPCISParser(object):
         logger.debug('Appending a quantity list element.')
         epcis_event.quantity_list.append(qe)
 
+    def handle_sbdh(self,
+                      header: template_sbdh.StandardBusinessDocumentHeader):
+        '''
+        Implement this method to support the handling of EPCPyYes
+        StandardBusinessDocumentHeader info.
+        :param header: The header value.
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(header.render())
+        logger.debug('handle_sbdh has been called.')
+
     def handle_object_event(self, epcis_event: template_events.ObjectEvent):
         '''
         Implement this method to support the handing of EPCPyYes ObjectEvent
@@ -608,7 +621,6 @@ class EPCISParser(object):
             # unless debug is set
             logger.debug(epcis_event.render())
         logger.debug('handle object event called...')
-        pass
 
     def handle_aggregation_event(
         self,
@@ -625,7 +637,6 @@ class EPCISParser(object):
             # unless debug is set
             logger.debug(epcis_event.render())
         logger.debug('handle aggregation event called...')
-        pass
 
     def handle_transaction_event(
         self,
@@ -643,7 +654,6 @@ class EPCISParser(object):
             # unless debug is set
             logger.debug(epcis_event.render())
         logger.debug('handle transaction event called...')
-        pass
 
     def handle_transformation_event(
         self,
@@ -661,4 +671,3 @@ class EPCISParser(object):
             # unless debug is set
             logger.debug(epcis_event.render())
         logger.debug('handle transaction event called...')
-        pass
