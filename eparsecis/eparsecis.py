@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2018 SerialLab, LLC.  All rights reserved.
+# Copyright 2018 SerialLab Corp.  All rights reserved.
 
 from lxml import etree
 import logging
@@ -493,12 +493,10 @@ class EPCISParser(object):
     def parse_ilmd(self, epcis_event, ilmd):
         for child in ilmd:
             logger.debug('%s,%s', child.tag, child.text.strip())
-            if child.prefix == 'cbvmd':
-                check_val = child.tag.split('}')[1]
-                logger.debug("check_val = %s" % check_val)
-                enum = get_ilmd_enum_by_value(check_val)
-                ilmd = InstanceLotMasterDataAttribute(enum, child.text.strip())
-                epcis_event.ilmd.append(ilmd)
+            check_val = child.tag.split('}')[1]
+            ilmd = InstanceLotMasterDataAttribute(check_val,
+                                                  child.text.strip())
+            epcis_event.ilmd.append(ilmd)
 
     def parse_quantity_list(self, epcis_event, quantity_list):
         '''
@@ -599,7 +597,7 @@ class EPCISParser(object):
         epcis_event.quantity_list.append(qe)
 
     def handle_sbdh(self,
-                      header: template_sbdh.StandardBusinessDocumentHeader):
+                    header: template_sbdh.StandardBusinessDocumentHeader):
         '''
         Implement this method to support the handling of EPCPyYes
         StandardBusinessDocumentHeader info.
