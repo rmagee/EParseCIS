@@ -292,6 +292,7 @@
                             <uom>LB</uom>
                         </quantityElement>
                     </outputQuantityList>
+                    <transformationID>391</transformationID>
                     <bizStep>urn:epcglobal:cbv:bizstep:repackaging</bizStep>
                     <disposition>urn:epcglobal:cbv:disp:returned</disposition>
                     <readPoint>

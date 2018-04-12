@@ -20,8 +20,8 @@ import logging
 
 from EPCPyYes.core.v1_2 import template_events
 from EPCPyYes.core.v1_2.events import Action, BusinessTransaction
-from EPCPyYes.core.v1_2.events import Source, Destination, QuantityElement
-from EPCPyYes.core.v1_2.CBV.helpers import get_ilmd_enum_by_value
+from EPCPyYes.core.v1_2.events import Source, Destination, QuantityElement, \
+    ErrorDeclaration
 from EPCPyYes.core.v1_2.CBV.instance_lot_master_data import \
     InstanceLotMasterDataAttribute
 from EPCPyYes.core.SBDH import sbdh, template_sbdh
@@ -234,6 +234,9 @@ class EPCISParser(object):
                     self.parse_biz_location(oevent, child)
                 elif child.tag == 'extension':
                     self.parse_extension(oevent, child)
+                elif child.tag == 'baseExtension':
+                    self.parse_base_extension(oevent, child)
+
         elif event == 'end':
             logger.debug('clearing out the Element')
             object_element.clear()
@@ -271,6 +274,8 @@ class EPCISParser(object):
                     self.parse_biz_location(aevent, child)
                 elif child.tag == 'extension':
                     self.parse_extension(aevent, child)
+                elif child.tag == 'baseExtension':
+                    self.parse_base_extension(aevent, child)
         elif event == 'end':
             logger.debug('clearing out the Element')
             aggregation_element.clear()
@@ -308,6 +313,8 @@ class EPCISParser(object):
                     self.parse_biz_location(tevent, child)
                 elif child.tag == 'extension':
                     self.parse_extension(tevent, child)
+                elif child.tag == 'baseExtension':
+                    self.parse_base_extension(tevent, child)
         elif event == 'end':
             logger.debug('clearing out the Element')
             transaction_element.clear()
@@ -358,6 +365,8 @@ class EPCISParser(object):
                     self.parse_source_list(tevent, child)
                 elif child.tag == 'destinationList':
                     self.parse_destination_list(tevent, child)
+                elif child.tag == 'baseExtension':
+                    self.parse_base_extension(tevent, child)
         elif event == 'end':
             logger.debug('clearing out the Element')
             transformation_element.clear()
@@ -463,6 +472,42 @@ class EPCISParser(object):
                     self.parse_quantity_list(epcis_event, child)
                 elif child.tag == 'childQuantityList':
                     self.parse_child_quantity_list(epcis_event, child)
+
+    def parse_base_extension(self, epcis_event, base_extension):
+        '''
+        Parses the EPCIS base extension.
+        '''
+        for child in base_extension:
+            if child.tag == 'eventID':
+                epcis_event.event_id = child.text.strip()
+            elif child.tag == 'errorDeclaration':
+                self.parse_error_declaration(epcis_event, child)
+
+    def parse_error_declaration(self, epcis_event, error_declaration):
+        '''
+        Parses the error declaration element.
+        :param epcis_event: The epcis EPCPyYes event.
+        :param error_declaration: The error declaration element.
+        :return: None.
+        '''
+        for child in error_declaration:
+            epcis_event.error_declaration = ErrorDeclaration()
+            if child.tag == 'declarationTime':
+                epcis_event.error_declaration.declaration_time = \
+                    child.text.strip()
+            elif child.tag == 'reason':
+                epcis_event.error_declaration.reason = child.text.strip()
+            elif child.tag == 'correctiveEventIDs':
+                self.parse_corrective_event_ids(epcis_event, child)
+
+    def parse_corrective_event_ids(self, epcis_event, corrective_event_ids):
+        '''
+        Adds correcitve event ids to the error declaration property.
+        '''
+        for corrective_event_id in corrective_event_ids:
+            epcis_event.error_declaration.corrective_event_ids.append(
+                corrective_event_id.text.strip()
+            )
 
     def parse_source_list(self, epcis_event, source_list):
         for child in source_list:

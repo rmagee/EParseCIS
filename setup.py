@@ -14,15 +14,13 @@ requirements = [
     'epcpyyes',
 ]
 
-test_requirements = [
-    # TODO: put package test requirements here
-]
+test_requirements = []
 
 setup(
     name='eparsecis',
     version='0.1.0',
     description="Python lxml parsing for EPCIS Events.",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author="Rob Magee",
     author_email='slab@serial-lab.com',
     maintainer="SerialLab Corp",
@@ -41,9 +39,11 @@ setup(
     zip_safe=False,
     keywords='eparsecis',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Healthcare Industry',
+        'Intended Audience :: Manufacturing',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
