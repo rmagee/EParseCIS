@@ -28,11 +28,7 @@ setup(
     packages=find_packages(),
     package_dir={'eparsecis':
                  'eparsecis'},
-    entry_points={
-        'console_scripts': [
-            'eparsecis=eparsecis.cli:main'
-        ]
-    },
+    entry_points={},
     include_package_data=True,
     install_requires=requirements,
     license="GNU General Public License v3",
