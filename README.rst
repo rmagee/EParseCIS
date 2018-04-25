@@ -2,6 +2,18 @@
 EParseCIS
 ===============================
 
+.. code-block:: text
+
+    ▓█████  ██▓███   ▄▄▄       ██▀███   ▄████▄   ██▓  ██████
+    ▓█   ▀ ▓██░  ██▒▒████▄    ▓██ ▒ ██▒▒██▀ ▀█  ▓██▒▒██    ▒
+    ▒███   ▓██░ ██▓▒▒██  ▀█▄  ▓██ ░▄█ ▒▒▓█    ▄ ▒██▒░ ▓██▄
+    ▒▓█  ▄ ▒██▄█▓▒ ▒░██▄▄▄▄██ ▒██▀▀█▄  ▒▓▓▄ ▄██▒░██░  ▒   ██▒
+    ░▒████▒▒██▒ ░  ░ ▓█   ▓██▒░██▓ ▒██▒▒ ▓███▀ ░░██░▒██████▒▒
+    ░░ ▒░ ░▒▓▒░ ░  ░ ▒▒   ▓▒█░░ ▒▓ ░▒▓░░ ░▒ ▒  ░░▓  ▒ ▒▓▒ ▒ ░
+     ░ ░  ░░▒ ░       ▒   ▒▒ ░  ░▒ ░ ▒░  ░  ▒    ▒ ░░ ░▒  ░ ░
+       ░   ░░         ░   ▒     ░░   ░ ░         ▒ ░░  ░  ░
+       ░  ░               ░  ░   ░     ░ ░       ░        ░
+                                       ░
 
 A Pythonic Approach to Parsing EPCIS Data
 -----------------------------------------
@@ -31,15 +43,8 @@ Features
 --------
 
 * Fast-forward lxml parsing of EPCIS xml-formatted data
-* Easy handling of EPCIS events as EPCPyYes python class instances as events are
-parsed.
+* Easy handling of EPCIS events as EPCPyYes python class instances as events are parsed.
 * Simplifies the building of EPCIS-enabled applications.
 
-Credits
----------
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 
