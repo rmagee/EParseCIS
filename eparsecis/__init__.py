@@ -2,4 +2,4 @@
 
 __author__ = """Rob Magee"""
 __email__ = 'slab@serial-lab.com'
-__version__ = '1.0.0'
+__version__ = '1.0.1'
