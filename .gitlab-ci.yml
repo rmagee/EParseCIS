@@ -54,7 +54,7 @@ pages:
         paths:
         - public
     only:
-      - master
+      - tags
 
 deploy_pypi:
   image: seriallab/python3.5dev
