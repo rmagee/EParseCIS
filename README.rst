@@ -16,7 +16,7 @@ minimal effort.
         :target: https://gitlab.com/serial-lab/EParseCIS/commits/master
 
 .. image:: https://gitlab.com/serial-lab/EParseCIS/badges/master/coverage.svg
-        :target: https://gitlab.com/serial-lab/EParseCIS/commits/master
+        :target: https://gitlab.com/serial-lab/EParseCIS/pipelines
 
 Note: Line-by-line code-coverage files can be found in the build artifacts.
 
