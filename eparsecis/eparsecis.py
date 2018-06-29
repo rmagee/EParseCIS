@@ -72,19 +72,36 @@ class EPCISParser(object):
     def parse(self):
         parser_lookup = etree.ElementDefaultClassLookup(
             element=EPCPyYesElement)
-        epcis = etree.iterparse(self.stream, events=('start', 'end'))
+        epcis = etree.iterparse(self.stream, events=('end',))
         epcis.set_element_class_lookup(parser_lookup)
         for event, element in epcis:
             if element.tag == 'EPCISHeader':
                 self.parse_epcis_header(event, element)
+                self.clear_element(element)
             elif element.tag == 'ObjectEvent':
                 self.parse_object_event_element(event, element)
+                self.clear_element(element)
             elif element.tag == 'AggregationEvent':
                 self.parse_aggregation_event_element(event, element)
+                self.clear_element(element)
             elif element.tag == 'TransactionEvent':
                 self.parse_transaction_event_element(event, element)
+                self.clear_element(element)
             elif element.tag == 'TransformationEvent':
                 self.parse_transformation_event_element(event, element)
+                self.clear_element(element)
+            else:
+                self.handle_unexpected_element(event, element)
+
+    def clear_element(self, element):
+        '''
+        Clears out an element and any previous (skipped over) elements.
+        :param element: The element to clear.
+        '''
+        element.clear()
+        # this will clean up any nodes that were skipped
+        while element.getprevious() is not None:
+            del element.getparent()[0]
 
     def parse_epcis_header(self, event, header_element):
         '''
@@ -94,20 +111,17 @@ class EPCISParser(object):
         :return: None
         '''
         logger.debug('handling the header')
-        if event == 'start':
-            for child in header_element:
-                if child.tag == self._sbdh_helper.sbdh:
-                    self.parse_sbdh(child)
-            else:
-                self.parse_header_info(event, child)
-        elif event == 'end':
-            logger.debug('Clearing out the header element.')
-            header_element.clear()
+        for child in header_element:
+            if child.tag == self._sbdh_helper.sbdh:
+                self.parse_sbdh(child)
+        else:
+            self.parse_header_info(event, child)
+        logger.debug('Clearing out the header element.')
+        header_element.clear()
 
     def parse_sbdh(self, sbdh_element):
         '''
         Parses out the Standard Business Document Header element.
-        :param event: The event.  Should always be 'start'
         :param sbdh_element: The element.
         :return: None
         '''
@@ -206,12 +220,12 @@ class EPCISParser(object):
         pass
 
     def parse_object_event_element(self, event, object_element):
-        oevent = None
         logger.debug('handling object event')
+<<<<<<< HEAD
         if event == 'start':
             oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
             for child in object_element:
-                logger.debug('%s,%s', child.tag, child.text.strip())
+                #logger.debug('%s,%s', child.tag, child.text.strip())
                 if child.tag == 'eventTime':
                     oevent.event_time = child.text.strip()
                 elif child.tag == 'bizTransactionList':
@@ -237,82 +251,104 @@ class EPCISParser(object):
         elif event == 'end':
             logger.debug('clearing out the Element')
             object_element.clear()
+=======
+        oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
+        for child in object_element:
+            logger.debug('%s,%s', child.tag, child.text.strip())
+            if child.tag == 'eventTime':
+                oevent.event_time = child.text.strip()
+            elif child.tag == 'bizTransactionList':
+                self.parse_biz_transaction_list(oevent, child)
+            elif child.tag == 'eventTimeZoneOffset':
+                oevent.event_timezone_offset = child.text.strip()
+            elif child.tag == 'recordTime':
+                oevent.record_time = child.text.strip()
+            elif child.tag == 'epcList':
+                self.parse_epc_list(oevent, child)
+            elif child.tag == 'action':
+                oevent.action = child.text.strip()
+            elif child.tag == 'bizStep':
+                oevent.biz_step = child.text.strip()
+            elif child.tag == 'disposition':
+                oevent.disposition = child.text.strip()
+            elif child.tag == 'readPoint':
+                self.parse_readpoint(oevent, child)
+            elif child.tag == 'bizLocation':
+                self.parse_biz_location(oevent, child)
+            elif child.tag == 'extension':
+                self.parse_extension(oevent, child)
+        logger.debug('clearing out the Element')
+        object_element.clear()
+>>>>>>> f825fefb4cc9e73e1e21ee163087e1cce2d2b8c9
         if oevent:
             self.handle_object_event(oevent)
 
     def parse_aggregation_event_element(self, event, aggregation_element):
-        aevent = None
         logger.debug('handling aggregation event')
-        if event == 'start':
-            aevent = template_events.AggregationEvent()
-            for child in aggregation_element:
-                logger.debug('%s,%s', child.tag, child.text.strip())
-                if child.tag == 'eventTime':
-                    aevent.event_time = child.text.strip().strip()
-                elif child.tag == 'eventTimeZoneOffset':
-                    aevent.event_timezone_offset = child.text.strip()
-                elif child.tag == 'bizTransactionList':
-                    self.parse_biz_transaction_list(aevent, child)
-                elif child.tag == 'recordTime':
-                    aevent.record_time = child.text.strip().strip()
-                elif child.tag == 'parentID':
-                    aevent.parent_id = child.text.strip().strip()
-                elif child.tag == 'childEPCs':
-                    self.parse_epc_list(aevent, child)
-                elif child.tag == 'action':
-                    aevent.action = child.text.strip().strip()
-                elif child.tag == 'bizStep':
-                    aevent.biz_step = child.text.strip().strip()
-                elif child.tag == 'disposition':
-                    aevent.disposition = child.text.strip().strip()
-                elif child.tag == 'readPoint':
-                    self.parse_readpoint(aevent, child)
-                elif child.tag == 'bizLocation':
-                    self.parse_biz_location(aevent, child)
-                elif child.tag == 'extension':
-                    self.parse_extension(aevent, child)
-        elif event == 'end':
-            logger.debug('clearing out the Element')
-            aggregation_element.clear()
-        if aevent:
-            self.handle_aggregation_event(aevent)
+        aevent = template_events.AggregationEvent()
+        for child in aggregation_element:
+            logger.debug('%s,%s', child.tag, child.text.strip())
+            if child.tag == 'eventTime':
+                aevent.event_time = child.text.strip().strip()
+            elif child.tag == 'eventTimeZoneOffset':
+                aevent.event_timezone_offset = child.text.strip()
+            elif child.tag == 'bizTransactionList':
+                self.parse_biz_transaction_list(aevent, child)
+            elif child.tag == 'recordTime':
+                aevent.record_time = child.text.strip().strip()
+            elif child.tag == 'parentID':
+                aevent.parent_id = child.text.strip().strip()
+            elif child.tag == 'childEPCs':
+                self.parse_epc_list(aevent, child)
+            elif child.tag == 'action':
+                aevent.action = child.text.strip().strip()
+            elif child.tag == 'bizStep':
+                aevent.biz_step = child.text.strip().strip()
+            elif child.tag == 'disposition':
+                aevent.disposition = child.text.strip().strip()
+            elif child.tag == 'readPoint':
+                self.parse_readpoint(aevent, child)
+            elif child.tag == 'bizLocation':
+                self.parse_biz_location(aevent, child)
+            elif child.tag == 'extension':
+                self.parse_extension(aevent, child)
+        logger.debug('clearing out the Element')
+        aggregation_element.clear()
+        self.handle_aggregation_event(aevent)
 
     def parse_transaction_event_element(self, event, transaction_element):
         tevent = None
         logger.debug('handling transaction event')
-        if event == 'start':
-            tevent = template_events.TransactionEvent()
-            for child in transaction_element:
-                logger.debug('%s,%s', child.tag, child.text.strip())
-                if child.tag == 'eventTime':
-                    tevent.event_time = child.text.strip()
-                elif child.tag == 'bizTransactionList':
-                    self.parse_biz_transaction_list(tevent, child)
-                elif child.tag == 'eventTimeZoneOffset':
-                    tevent.event_timezone_offset = child.text.strip()
-                elif child.tag == 'recordTime':
-                    tevent.record_time = child.text.strip()
-                elif child.tag == 'parentID':
-                    tevent.parent_id = child.text.strip()
-                elif child.tag == 'epcList':
-                    self.parse_epc_list(tevent, child)
-                elif child.tag == 'action':
-                    tevent.action = child.text.strip()
-                elif child.tag == 'bizStep':
-                    tevent.biz_step = child.text.strip()
-                elif child.tag == 'disposition':
-                    tevent.disposition = child.text.strip()
-                elif child.tag == 'readPoint':
-                    self.parse_readpoint(tevent, child)
-                elif child.tag == 'bizLocation':
-                    self.parse_biz_location(tevent, child)
-                elif child.tag == 'extension':
-                    self.parse_extension(tevent, child)
-        elif event == 'end':
-            logger.debug('clearing out the Element')
-            transaction_element.clear()
-        if tevent:
-            self.handle_transaction_event(tevent)
+        tevent = template_events.TransactionEvent()
+        for child in transaction_element:
+            logger.debug('%s,%s', child.tag, child.text.strip())
+            if child.tag == 'eventTime':
+                tevent.event_time = child.text.strip()
+            elif child.tag == 'bizTransactionList':
+                self.parse_biz_transaction_list(tevent, child)
+            elif child.tag == 'eventTimeZoneOffset':
+                tevent.event_timezone_offset = child.text.strip()
+            elif child.tag == 'recordTime':
+                tevent.record_time = child.text.strip()
+            elif child.tag == 'parentID':
+                tevent.parent_id = child.text.strip()
+            elif child.tag == 'epcList':
+                self.parse_epc_list(tevent, child)
+            elif child.tag == 'action':
+                tevent.action = child.text.strip()
+            elif child.tag == 'bizStep':
+                tevent.biz_step = child.text.strip()
+            elif child.tag == 'disposition':
+                tevent.disposition = child.text.strip()
+            elif child.tag == 'readPoint':
+                self.parse_readpoint(tevent, child)
+            elif child.tag == 'bizLocation':
+                self.parse_biz_location(tevent, child)
+            elif child.tag == 'extension':
+                self.parse_extension(tevent, child)
+        logger.debug('clearing out the Element')
+        transaction_element.clear()
+        self.handle_transaction_event(tevent)
 
     def parse_transformation_event_element(
         self,
@@ -321,48 +357,45 @@ class EPCISParser(object):
     ):
         tevent = None
         logger.debug('handling transaction event')
-        if event == 'start':
-            tevent = template_events.TransformationEvent()
-            for child in transformation_element:
-                if child.tag == 'eventTime':
-                    tevent.event_time = child.text.strip()
-                elif child.tag == 'eventTimeZoneOffset':
-                    tevent.event_timezone_offset = child.text.strip()
-                elif child.tag == 'recordTime':
-                    tevent.record_time = child.text.strip()
-                elif child.tag == 'bizTransactionList':
-                    self.parse_biz_transaction_list(tevent, child)
-                elif child.tag == 'eventTimeZoneOffset':
-                    tevent.event_timezone_offset = child.text.strip()
-                elif child.tag == 'inputEPCList':
-                    self.parse_input_epc_list(tevent, child)
-                elif child.tag == 'outputEPCList':
-                    self.parse_output_epc_list(tevent, child)
-                elif child.tag == 'transformationID':
-                    tevent.transformation_id = child.text.strip()
-                elif child.tag == 'bizStep':
-                    tevent.biz_step = child.text.strip()
-                elif child.tag == 'disposition':
-                    tevent.disposition = child.text.strip()
-                elif child.tag == 'readPoint':
-                    self.parse_readpoint(tevent, child)
-                elif child.tag == 'bizLocation':
-                    self.parse_biz_location(tevent, child)
-                elif child.tag == 'inputQuantityList':
-                    self.parse_input_quantity_list(tevent, child)
-                elif child.tag == 'outputQuantityList':
-                    self.parse_output_quantity_list(tevent, child)
-                elif child.tag == 'ilmd':
-                    self.parse_ilmd(tevent, child)
-                elif child.tag == 'sourceList':
-                    self.parse_source_list(tevent, child)
-                elif child.tag == 'destinationList':
-                    self.parse_destination_list(tevent, child)
-        elif event == 'end':
-            logger.debug('clearing out the Element')
-            transformation_element.clear()
-        if tevent:
-            self.handle_transformation_event(tevent)
+        tevent = template_events.TransformationEvent()
+        for child in transformation_element:
+            if child.tag == 'eventTime':
+                tevent.event_time = child.text.strip()
+            elif child.tag == 'eventTimeZoneOffset':
+                tevent.event_timezone_offset = child.text.strip()
+            elif child.tag == 'recordTime':
+                tevent.record_time = child.text.strip()
+            elif child.tag == 'bizTransactionList':
+                self.parse_biz_transaction_list(tevent, child)
+            elif child.tag == 'eventTimeZoneOffset':
+                tevent.event_timezone_offset = child.text.strip()
+            elif child.tag == 'inputEPCList':
+                self.parse_input_epc_list(tevent, child)
+            elif child.tag == 'outputEPCList':
+                self.parse_output_epc_list(tevent, child)
+            elif child.tag == 'transformationID':
+                tevent.transformation_id = child.text.strip()
+            elif child.tag == 'bizStep':
+                tevent.biz_step = child.text.strip()
+            elif child.tag == 'disposition':
+                tevent.disposition = child.text.strip()
+            elif child.tag == 'readPoint':
+                self.parse_readpoint(tevent, child)
+            elif child.tag == 'bizLocation':
+                self.parse_biz_location(tevent, child)
+            elif child.tag == 'inputQuantityList':
+                self.parse_input_quantity_list(tevent, child)
+            elif child.tag == 'outputQuantityList':
+                self.parse_output_quantity_list(tevent, child)
+            elif child.tag == 'ilmd':
+                self.parse_ilmd(tevent, child)
+            elif child.tag == 'sourceList':
+                self.parse_source_list(tevent, child)
+            elif child.tag == 'destinationList':
+                self.parse_destination_list(tevent, child)
+        logger.debug('clearing out the Element')
+        transformation_element.clear()
+        self.handle_transformation_event(tevent)
 
     def parse_biz_transaction_list(self, event, list):
         '''
@@ -394,9 +427,18 @@ class EPCISParser(object):
         elif hasattr(event, 'child_epcs'):
             target = event.child_epcs
         for epc in list:
-            target.append(epc.text)
-            logger.debug(epc.text)
-            epc.clear()
+            if not type(epc) is etree._Comment:
+<<<<<<< HEAD
+                target.append(epc.text)
+                logger.debug(epc.text)
+=======
+                if epc.text:
+                    target.append(epc.text)
+                    logger.debug(epc.text)
+                else:
+                    print('no epc')
+>>>>>>> f825fefb4cc9e73e1e21ee163087e1cce2d2b8c9
+                epc.clear()
 
     def parse_input_epc_list(self,
                              event: template_events.TransformationEvent,
@@ -438,7 +480,7 @@ class EPCISParser(object):
 
     def parse_biz_location(self, epcis_event, biz_location):
         for child in biz_location:
-            if child.tag == 'id':
+            if child.tag == 'id' and child.text:
                 epcis_event.biz_location = child.text.strip()
                 logger.debug('%s,%s', child.tag, child.text.strip())
 
@@ -599,7 +641,7 @@ class EPCISParser(object):
         epcis_event.quantity_list.append(qe)
 
     def handle_sbdh(self,
-                      header: template_sbdh.StandardBusinessDocumentHeader):
+                    header: template_sbdh.StandardBusinessDocumentHeader):
         '''
         Implement this method to support the handling of EPCPyYes
         StandardBusinessDocumentHeader info.
@@ -671,3 +713,16 @@ class EPCISParser(object):
             # unless debug is set
             logger.debug(epcis_event.render())
         logger.debug('handle transaction event called...')
+
+<<<<<<< HEAD
+=======
+    def handle_unexpected_element(self, event, element):
+        '''
+        If an element is found within the EPCIS document that was unexpected
+        it will be handed to this event.  Implement this function to handle
+        any unexpected or custom elements.
+        :param event: The event (usually "end")
+        :param element: The lxml.etree.Element that was found.
+        '''
+        pass
+>>>>>>> f825fefb4cc9e73e1e21ee163087e1cce2d2b8c9
