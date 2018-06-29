@@ -20,7 +20,7 @@ test_requirements = [
 
 setup(
     name='eparsecis',
-    version='0.1.0',
+    version='1.0.0',
     description="Python lxml parsing for EPCIS Events.",
     long_description=readme + '\n\n' + history,
     author="Serial Lab, LLC",
@@ -42,7 +42,7 @@ setup(
     zip_safe=False,
     keywords='eparsecis',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
