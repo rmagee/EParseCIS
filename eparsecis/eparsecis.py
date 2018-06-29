@@ -211,7 +211,7 @@ class EPCISParser(object):
         if event == 'start':
             oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
             for child in object_element:
-                logger.debug('%s,%s', child.tag, child.text.strip())
+                #logger.debug('%s,%s', child.tag, child.text.strip())
                 if child.tag == 'eventTime':
                     oevent.event_time = child.text.strip()
                 elif child.tag == 'bizTransactionList':
@@ -394,9 +394,10 @@ class EPCISParser(object):
         elif hasattr(event, 'child_epcs'):
             target = event.child_epcs
         for epc in list:
-            target.append(epc.text)
-            logger.debug(epc.text)
-            epc.clear()
+            if not type(epc) is etree._Comment:
+                target.append(epc.text)
+                logger.debug(epc.text)
+                epc.clear()
 
     def parse_input_epc_list(self,
                              event: template_events.TransformationEvent,
@@ -438,7 +439,7 @@ class EPCISParser(object):
 
     def parse_biz_location(self, epcis_event, biz_location):
         for child in biz_location:
-            if child.tag == 'id':
+            if child.tag == 'id' and child.text:
                 epcis_event.biz_location = child.text.strip()
                 logger.debug('%s,%s', child.tag, child.text.strip())
 
@@ -671,3 +672,4 @@ class EPCISParser(object):
             # unless debug is set
             logger.debug(epcis_event.render())
         logger.debug('handle transaction event called...')
+
