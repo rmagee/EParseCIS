@@ -30,6 +30,9 @@ minimal effort.
 .. image:: https://gitlab.com/serial-lab/EParseCIS/badges/master/coverage.svg
         :target: https://gitlab.com/serial-lab/EParseCIS/pipelines
 
+.. image:: https://badge.fury.io/py/quartet_epcis.svg
+    :target: https://badge.fury.io/py/quartet_epcis
+
 Note: Line-by-line code-coverage files can be found in the build artifacts.
 
 Python lxml Parser for EPCIS Events
