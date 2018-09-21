@@ -330,7 +330,6 @@ class EPCISParser(object):
         event,
         transformation_element
     ):
-        tevent = None
         logger.debug('handling transaction event')
         tevent = template_events.TransformationEvent()
         for child in transformation_element:
@@ -725,3 +724,370 @@ class EPCISParser(object):
         :param element: The lxml.etree.Element that was found.
         '''
         pass
+
+
+class FlexibleNSParser(EPCISParser):
+    '''
+    This parser is identical in functionality to the `EPCISParser`; however,
+    when testing for element tag values this parser will look for element
+    tag values inside using an `in` clause as opposed to looking for an exact
+    match.  For example if you have an epcis document with namespace
+    declarations, then the `EPCISParser` will not find node `<ns1:ObjectEvent>`
+    since it is not an exact match.  This parser will do an "in" and look
+    for ObjectEvent in `<ns1:ObjectEvent>` and will find it.  Having said that,
+    this parser is a little slower due to the fact that it is looking in
+    string values as opposed to comparing string values.
+    '''
+    def parse(self, huge_tree=False):
+        parser_lookup = etree.ElementDefaultClassLookup(
+            element=EPCPyYesElement)
+        epcis = etree.iterparse(self.stream, events=('end',),
+                                remove_comments=True, huge_tree=huge_tree)
+        epcis.set_element_class_lookup(parser_lookup)
+        for event, element in epcis:
+            if 'EPCISHeader' in element.tag:
+                self.parse_epcis_header(event, element)
+                self.clear_element(element)
+            elif 'ObjectEvent' in element.tag:
+                self.parse_object_event_element(event, element)
+                self.clear_element(element)
+            elif 'AggregationEvent' in element.tag:
+                self.parse_aggregation_event_element(event, element)
+                self.clear_element(element)
+            elif 'TransactionEvent' in element.tag:
+                self.parse_transaction_event_element(event, element)
+                self.clear_element(element)
+            elif 'TransformationEvent' in element.tag:
+                self.parse_transformation_event_element(event, element)
+                self.clear_element(element)
+            else:
+                self.handle_unexpected_element(event, element)
+
+    def parse_object_event_element(self, event, object_element):
+        logger.debug('handling object event')
+        oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
+        for child in object_element:
+            logger.debug('%s,%s', child.tag, child.text.strip())
+            if child.tag.endswith('eventTime'):
+                oevent.event_time = child.text.strip()
+            elif child.tag.__contains__('bizTransactionList'):
+                self.parse_biz_transaction_list(oevent, child)
+            elif child.tag.__contains__('eventTimeZoneOffset'):
+                oevent.event_timezone_offset = child.text.strip()
+            elif child.tag.__contains__('recordTime'):
+                oevent.record_time = child.text.strip()
+            elif child.tag.__contains__('epcList'):
+                self.parse_epc_list(oevent, child)
+            elif child.tag.__contains__('action'):
+                oevent.action = child.text.strip()
+            elif child.tag.__contains__('bizStep'):
+                oevent.biz_step = child.text.strip()
+            elif child.tag.__contains__('disposition'):
+                oevent.disposition = child.text.strip()
+            elif child.tag.__contains__('readPoint'):
+                self.parse_readpoint(oevent, child)
+            elif child.tag.__contains__('bizLocation'):
+                self.parse_biz_location(oevent, child)
+            elif child.tag.__contains__('extension'):
+                self.parse_extension(oevent, child)
+            elif child.tag.__contains__('baseExtension'):
+                self.parse_base_extension(oevent, child)
+        logger.debug('clearing out the Element')
+        object_element.clear()
+        if oevent:
+            self.handle_object_event(oevent)
+
+    def parse_aggregation_event_element(self, event, aggregation_element):
+        logger.debug('handling aggregation event')
+        aevent = template_events.AggregationEvent()
+        for child in aggregation_element:
+            logger.debug('%s,%s', child.tag, child.text.strip())
+            if child.tag.endswith('eventTime'):
+                aevent.event_time = child.text.strip()
+            elif child.tag.__contains__('eventTimeZoneOffset'):
+                aevent.event_timezone_offset = child.text.strip()
+            elif child.tag.__contains__('bizTransactionList'):
+                self.parse_biz_transaction_list(aevent, child)
+            elif child.tag.__contains__('recordTime'):
+                aevent.record_time = child.text.strip().strip()
+            elif child.tag.__contains__('parentID'):
+                aevent.parent_id = child.text.strip().strip()
+            elif child.tag.__contains__('childEPCs'):
+                self.parse_epc_list(aevent, child)
+            elif child.tag.__contains__('action'):
+                aevent.action = child.text.strip().strip()
+            elif child.tag.__contains__('bizStep'):
+                aevent.biz_step = child.text.strip().strip()
+            elif child.tag.__contains__('disposition'):
+                aevent.disposition = child.text.strip().strip()
+            elif child.tag.__contains__('readPoint'):
+                self.parse_readpoint(aevent, child)
+            elif child.tag.__contains__('bizLocation'):
+                self.parse_biz_location(aevent, child)
+            elif child.tag.__contains__('extension'):
+                self.parse_extension(aevent, child)
+            elif child.tag.__contains__('baseExtension'):
+                self.parse_base_extension(aevent, child)
+        logger.debug('clearing out the Element')
+        aggregation_element.clear()
+        self.handle_aggregation_event(aevent)
+
+    def parse_transaction_event_element(self, event, transaction_element):
+        tevent = None
+        logger.debug('handling transaction event')
+        tevent = template_events.TransactionEvent()
+        for child in transaction_element:
+            logger.debug('%s,%s', child.tag, child.text.strip())
+            if child.tag.endswith('eventTime'):
+                tevent.event_time = child.text.strip()
+            elif child.tag.__contains__('bizTransactionList'):
+                self.parse_biz_transaction_list(tevent, child)
+            elif child.tag.__contains__('eventTimeZoneOffset'):
+                tevent.event_timezone_offset = child.text.strip()
+            elif child.tag.__contains__('recordTime'):
+                tevent.record_time = child.text.strip()
+            elif child.tag.__contains__('parentID'):
+                tevent.parent_id = child.text.strip()
+            elif child.tag.__contains__('epcList'):
+                self.parse_epc_list(tevent, child)
+            elif child.tag.__contains__('action'):
+                tevent.action = child.text.strip()
+            elif child.tag.__contains__('bizStep'):
+                tevent.biz_step = child.text.strip()
+            elif child.tag.__contains__('disposition'):
+                tevent.disposition = child.text.strip()
+            elif child.tag.__contains__('readPoint'):
+                self.parse_readpoint(tevent, child)
+            elif child.tag.__contains__('bizLocation'):
+                self.parse_biz_location(tevent, child)
+            elif child.tag.__contains__('extension'):
+                self.parse_extension(tevent, child)
+            elif child.tag.__contains__('baseExtension'):
+                self.parse_base_extension(tevent, child)
+        logger.debug('clearing out the Element')
+        transaction_element.clear()
+        self.handle_transaction_event(tevent)
+
+    def parse_transformation_event_element(
+        self,
+        event,
+        transformation_element
+    ):
+        logger.debug('handling transaction event')
+        tevent = template_events.TransformationEvent()
+        for child in transformation_element:
+            if child.tag.endswith('eventTime'):
+                tevent.event_time = child.text.strip()
+            elif child.tag.__contains__('eventTimeZoneOffset'):
+                tevent.event_timezone_offset = child.text.strip()
+            elif child.tag.__contains__('recordTime'):
+                tevent.record_time = child.text.strip()
+            elif child.tag.__contains__('bizTransactionList'):
+                self.parse_biz_transaction_list(tevent, child)
+            elif child.tag.__contains__('eventTimeZoneOffset'):
+                tevent.event_timezone_offset = child.text.strip()
+            elif child.tag.__contains__('inputEPCList'):
+                self.parse_input_epc_list(tevent, child)
+            elif child.tag.__contains__('outputEPCList'):
+                self.parse_output_epc_list(tevent, child)
+            elif child.tag.__contains__('transformationID'):
+                tevent.transformation_id = child.text.strip()
+            elif child.tag.__contains__('bizStep'):
+                tevent.biz_step = child.text.strip()
+            elif child.tag.__contains__('disposition'):
+                tevent.disposition = child.text.strip()
+            elif child.tag.__contains__('readPoint'):
+                self.parse_readpoint(tevent, child)
+            elif child.tag.__contains__('bizLocation'):
+                self.parse_biz_location(tevent, child)
+            elif child.tag.__contains__('inputQuantityList'):
+                self.parse_input_quantity_list(tevent, child)
+            elif child.tag.__contains__('outputQuantityList'):
+                self.parse_output_quantity_list(tevent, child)
+            elif child.tag.__contains__('ilmd'):
+                self.parse_ilmd(tevent, child)
+            elif child.tag.__contains__('sourceList'):
+                self.parse_source_list(tevent, child)
+            elif child.tag.__contains__('destinationList'):
+                self.parse_destination_list(tevent, child)
+            elif child.tag.__contains__('baseExtension'):
+                self.parse_base_extension(tevent, child)
+        logger.debug('clearing out the Element')
+        transformation_element.clear()
+        self.handle_transformation_event(tevent)
+
+    def parse_biz_transaction_list(self, event, list):
+        '''
+        Parses the business transaction list if supplied in a
+        given event and adds that info to the event.
+        :param event: The EPCIS event
+        :param list: The element containing the list.
+        '''
+        for child in list:
+            bt = BusinessTransaction(
+                child.text.strip()
+            )
+            for name, value in child.attrib.items():
+                logger.debug('%s,%s', name, value)
+                if name.__contains__('type'):
+                    bt.type = value
+            event.business_transaction_list.append(bt)
+
+    def parse_readpoint(self, epcis_event, read_point):
+        for child in read_point:
+            if 'id' in child.tag:
+                epcis_event.read_point = child.text.strip()
+                logger.debug('%s,%s', child.tag, child.text.strip())
+
+    def parse_biz_location(self, epcis_event, biz_location):
+        for child in biz_location:
+            if 'id' in child.tag:
+                epcis_event.biz_location = child.text.strip()
+                logger.debug('%s,%s', child.tag, child.text.strip())
+
+    def parse_extension(self, epcis_event, extension):
+        '''
+        Called when the extension is encountered for each event.
+        If you need to process custom extensions, override this function.
+        :param epcis_event: The inbound event
+        :param extension: The extension lxml element.
+        :return: None
+        '''
+        # Transformation events don't have standardized extensions...
+        if not isinstance(epcis_event, template_events.TransformationEvent):
+            for child in extension:
+                if child.tag.__contains__('sourceList'):
+                    self.parse_source_list(epcis_event, child)
+                elif child.tag.__contains__('destinationList'):
+                    self.parse_destination_list(epcis_event, child)
+                elif child.tag.__contains__('ilmd'):
+                    self.parse_ilmd(epcis_event, child)
+                elif child.tag.__contains__('quantityList'):
+                    self.parse_quantity_list(epcis_event, child)
+                elif child.tag.__contains__('childQuantityList'):
+                    self.parse_child_quantity_list(epcis_event, child)
+
+    def parse_base_extension(self, epcis_event, base_extension):
+        '''
+        Parses the EPCIS base extension.
+        '''
+        for child in base_extension:
+            if child.tag.__contains__('eventID'):
+                epcis_event.event_id = child.text.strip()
+            elif child.tag.__contains__('errorDeclaration'):
+                self.parse_error_declaration(epcis_event, child)
+
+    def parse_error_declaration(self, epcis_event, error_declaration):
+        '''
+        Parses the error declaration element.
+        :param epcis_event: The epcis EPCPyYes event.
+        :param error_declaration: The error declaration element.
+        :return: None.
+        '''
+        for child in error_declaration:
+            epcis_event.error_declaration = ErrorDeclaration()
+            if 'declarationTime' in child.tag:
+                epcis_event.error_declaration.declaration_time = \
+                    child.text.strip()
+            elif 'reason' in child.tag:
+                epcis_event.error_declaration.reason = child.text.strip()
+            elif 'correctiveEventIDs' in child.tag:
+                self.parse_corrective_event_ids(epcis_event, child)
+
+    def parse_quantity_list(self, epcis_event, quantity_list):
+        '''
+        Takes a quantity list element as an input and parses it
+        into an EPCPyYes QuantityElement instance.
+        :param epcis_event: The EPCPyYes event instance that will contain
+        the parsed QuantityElement instance as an attribute.
+        :param quantity_list: The Element containing the quantity_list.
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if 'quantityElement' in child.tag:
+                self.parse_quantity_element(epcis_event, child)
+
+    def parse_child_quantity_list(self, epcis_event, quantity_list):
+        '''
+        Takes a child quantity list element as an input and parses it
+        into an EPCPyYes QuantityElement instance.
+        :param epcis_event: The EPCPyYes event instance that will contain
+        the parsed QuantityElement instance as an attribute.
+        :param quantity_list: The Element containing the quantity_list.
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if 'quantityElement' in child.tag:
+                epcis_event.child_quantity_list.append(
+                    self.get_quantity_element(child)
+                )
+
+    def parse_input_quantity_list(self, epcis_event,
+                                  quantity_list):
+        '''
+        Takes a transformation event input quantity list
+        element as an input and parses it
+        into an EPCPyYes QuantityElement instance.
+        :param epcis_event: The EPCPyYes event instance that will contain
+        the parsed QuantityElement instance as an attribute.
+        :param quantity_list: The Element containing the quantity_list.
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if 'quantityElement' in child.tag:
+                epcis_event.input_quantity_list.append(
+                    self.get_quantity_element(child)
+                )
+
+    def parse_output_quantity_list(self, epcis_event,
+                                   quantity_list):
+        '''
+        Takes a transformation event input quantity list
+        element as an output and parses it
+        into an EPCPyYes QuantityElement instance.
+        :param epcis_event: The EPCPyYes event instance that will contain
+        the parsed QuantityElement instance as an attribute.
+        :param quantity_list: The Element containing the quantity_list.
+        :return: None
+        '''
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(epcis_event.render())
+        for child in quantity_list:
+            if 'quantityElement' in child.tag:
+                epcis_event.output_quantity_list.append(
+                    self.get_quantity_element(child)
+                )
+
+    def get_quantity_element(self, quantity_element):
+        '''
+        Parses and returns a quantity element.
+        :param quantity_element:
+        :return: An EPCPyYes QuantityElement.
+        '''
+        qe = QuantityElement('')
+        for child in quantity_element:
+            if 'epcClass' in child.tag:
+                qe.epc_class = child.text.strip()
+            elif 'quantity' in child.tag:
+                qe.quantity = float(child.text.strip())
+            elif 'uom' in child.tag:
+                qe.uom = child.text.strip()
+        return qe
+
+    def parse_quantity_element(self, epcis_event, quantity_element):
+        qe = QuantityElement('')
+        for child in quantity_element:
+            if 'epcClass' in child.tag:
+                qe.epc_class = child.text.strip()
+            elif 'quantity' in child.tag:
+                qe.quantity = float(child.text.strip())
+            elif 'uom' in child.tag:
+                qe.uom = child.text.strip()
+        logger.debug('Appending a quantity list element.')
+        epcis_event.quantity_list.append(qe)

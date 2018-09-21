@@ -11,7 +11,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'lxml',
-    'epcpyyes',
+    'EPCPyYes',
 ]
 
 test_requirements = []
