@@ -224,7 +224,7 @@ class EPCISParser(object):
         logger.debug('handling object event')
         oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
         for child in object_element:
-            logger.debug('%s,%s', child.tag, child.text.strip())
+            logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
                 oevent.event_time = child.text.strip()
             elif child.tag == 'bizTransactionList':
@@ -258,7 +258,7 @@ class EPCISParser(object):
         logger.debug('handling aggregation event')
         aevent = template_events.AggregationEvent()
         for child in aggregation_element:
-            logger.debug('%s,%s', child.tag, child.text.strip())
+            logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
                 aevent.event_time = child.text.strip().strip()
             elif child.tag == 'eventTimeZoneOffset':
@@ -294,7 +294,7 @@ class EPCISParser(object):
         logger.debug('handling transaction event')
         tevent = template_events.TransactionEvent()
         for child in transaction_element:
-            logger.debug('%s,%s', child.tag, child.text.strip())
+            logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
                 tevent.event_time = child.text.strip()
             elif child.tag == 'bizTransactionList':
@@ -767,7 +767,7 @@ class FlexibleNSParser(EPCISParser):
         logger.debug('handling object event')
         oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
         for child in object_element:
-            logger.debug('%s,%s', child.tag, child.text.strip())
+            logger.debug('%s,%s', child.tag, child.text)
             if child.tag.endswith('eventTime'):
                 oevent.event_time = child.text.strip()
             elif child.tag.__contains__('bizTransactionList'):
@@ -801,7 +801,7 @@ class FlexibleNSParser(EPCISParser):
         logger.debug('handling aggregation event')
         aevent = template_events.AggregationEvent()
         for child in aggregation_element:
-            logger.debug('%s,%s', child.tag, child.text.strip())
+            logger.debug('%s,%s', child.tag, child.text)
             if child.tag.endswith('eventTime'):
                 aevent.event_time = child.text.strip()
             elif child.tag.__contains__('eventTimeZoneOffset'):
