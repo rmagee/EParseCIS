@@ -17,3 +17,8 @@ element contents correctly (eventDeclarations and eventID).
 
 Added the FlexibleNSParser to deal with explicit namespace declarations in
 EPCIS XML documents in the main EPCIS namespace.
+
+2.0.1
+-----
+
+Removed some debug logging commands that could throw exceptions.
