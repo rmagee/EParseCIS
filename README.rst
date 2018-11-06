@@ -30,8 +30,8 @@ minimal effort.
 .. image:: https://gitlab.com/serial-lab/EParseCIS/badges/master/coverage.svg
         :target: https://gitlab.com/serial-lab/EParseCIS/pipelines
 
-.. image:: https://badge.fury.io/py/quartet_eparsecis.svg
-    :target: https://badge.fury.io/py/quartet_eparsecis
+.. image:: https://badge.fury.io/py/eparsecis.svg
+    :target: https://pypi.org/project/eparsecis/
 
 Note: Line-by-line code-coverage files can be found in the build artifacts.
 
