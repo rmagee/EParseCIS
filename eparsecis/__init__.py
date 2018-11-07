@@ -15,4 +15,4 @@
 # Copyright 2018 SerialLab Corp.  All rights reserved.
 __author__ = """Rob Magee"""
 __email__ = 'slab@serial-lab.com'
-__version__ = '2.0.4'
+__version__ = '2.0.5'
