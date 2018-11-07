@@ -18,7 +18,7 @@ test_requirements = []
 
 setup(
     name='eparsecis',
-    version='2.0.6',
+    version='2.0.7',
     description="Python lxml parsing for EPCIS Events.",
     long_description=readme,
     author="Rob Magee",
