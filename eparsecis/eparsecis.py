@@ -310,7 +310,7 @@ class EPCISParser(object):
     def parse_transaction_event_element(self, event, transaction_element):
         tevent = None
         logger.debug('handling transaction event')
-        tevent = self.get_epcpyyes_transaction_event(tevent)
+        tevent = self.get_epcpyyes_transaction_event()
         for child in transaction_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
