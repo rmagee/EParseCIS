@@ -801,7 +801,7 @@ class FlexibleNSParser(EPCISParser):
 
     def parse_object_event_element(self, event, object_element):
         logger.debug('handling object event')
-        oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
+        oevent = self.get_epcpyyes_object_event(epc_list=[], quantity_list=[])
         for child in object_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag.endswith('eventTime'):
@@ -835,7 +835,7 @@ class FlexibleNSParser(EPCISParser):
 
     def parse_aggregation_event_element(self, event, aggregation_element):
         logger.debug('handling aggregation event')
-        aevent = template_events.AggregationEvent()
+        aevent = self.get_epcpyyes_aggregation_event()
         for child in aggregation_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag.endswith('eventTime'):
@@ -871,7 +871,7 @@ class FlexibleNSParser(EPCISParser):
     def parse_transaction_event_element(self, event, transaction_element):
         tevent = None
         logger.debug('handling transaction event')
-        tevent = template_events.TransactionEvent()
+        tevent = self.get_epcpyyes_transaction_event()
         for child in transaction_element:
             logger.debug('%s,%s', child.tag, child.text.strip())
             if child.tag.endswith('eventTime'):
@@ -910,7 +910,7 @@ class FlexibleNSParser(EPCISParser):
         transformation_element
     ):
         logger.debug('handling transaction event')
-        tevent = template_events.TransformationEvent()
+        tevent = self.get_epcpyyes_transformation_event()
         for child in transformation_element:
             if child.tag.endswith('eventTime'):
                 tevent.event_time = child.text.strip()
