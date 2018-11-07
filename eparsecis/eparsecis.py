@@ -31,7 +31,7 @@ from eparsecis.elements import EPCPyYesElement
 logger = logging.getLogger()
 
 
-class EPCISParser(object):
+class   EPCISParser(object):
     '''
     Parses EPCIS XML from a stream and serializes each EPCIS Event
     in a given document into a serialized EPCPyYes event object.
@@ -222,7 +222,7 @@ class EPCISParser(object):
 
     def parse_object_event_element(self, event, object_element):
         logger.debug('handling object event')
-        oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
+        oevent = self.get_epcpyyes_object_event()
         for child in object_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
@@ -254,9 +254,18 @@ class EPCISParser(object):
         if oevent:
             self.handle_object_event(oevent)
 
+    def get_epcpyyes_object_event(self):
+        """
+        Override to return a different EPCPyYes object with custom templates
+        for example.
+        :return:
+        """
+        oevent = template_events.ObjectEvent(epc_list=[], quantity_list=[])
+        return oevent
+
     def parse_aggregation_event_element(self, event, aggregation_element):
         logger.debug('handling aggregation event')
-        aevent = template_events.AggregationEvent()
+        aevent = self.get_epcpyyes_aggregation_event()
         for child in aggregation_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
@@ -289,10 +298,19 @@ class EPCISParser(object):
         aggregation_element.clear()
         self.handle_aggregation_event(aevent)
 
+    def get_epcpyyes_aggregation_event(self):
+        """
+        Override to return a different EPCPyYes object with custom templates
+        for example.
+        :return:
+        """
+        aevent = template_events.AggregationEvent()
+        return aevent
+
     def parse_transaction_event_element(self, event, transaction_element):
         tevent = None
         logger.debug('handling transaction event')
-        tevent = template_events.TransactionEvent()
+        tevent = self.get_epcpyyes_transaction_event(tevent)
         for child in transaction_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
@@ -325,13 +343,22 @@ class EPCISParser(object):
         transaction_element.clear()
         self.handle_transaction_event(tevent)
 
+    def get_epcpyyes_transaction_event(self, tevent):
+        """
+        Override to return a different EPCPyYes object with custom templates
+        for example.
+        :return:
+        """
+        tevent = template_events.TransactionEvent()
+        return tevent
+
     def parse_transformation_event_element(
         self,
         event,
         transformation_element
     ):
         logger.debug('handling transaction event')
-        tevent = template_events.TransformationEvent()
+        tevent = self.get_epcpyyes_transformation_event()
         for child in transformation_element:
             if child.tag == 'eventTime':
                 tevent.event_time = child.text.strip()
@@ -372,6 +399,15 @@ class EPCISParser(object):
         logger.debug('clearing out the Element')
         transformation_element.clear()
         self.handle_transformation_event(tevent)
+
+    def get_epcpyyes_transformation_event(self):
+        """
+        Override to return a different EPCPyYes object with custom templates
+        for example.
+        :return:
+        """
+        tevent = template_events.TransformationEvent()
+        return tevent
 
     def parse_biz_transaction_list(self, event, list):
         '''
