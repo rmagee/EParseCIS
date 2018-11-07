@@ -31,7 +31,7 @@ from eparsecis.elements import EPCPyYesElement
 logger = logging.getLogger()
 
 
-class   EPCISParser(object):
+class EPCISParser(object):
     '''
     Parses EPCIS XML from a stream and serializes each EPCIS Event
     in a given document into a serialized EPCPyYes event object.
