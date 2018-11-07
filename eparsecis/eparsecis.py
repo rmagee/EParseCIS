@@ -343,14 +343,13 @@ class EPCISParser(object):
         transaction_element.clear()
         self.handle_transaction_event(tevent)
 
-    def get_epcpyyes_transaction_event(self, tevent):
+    def get_epcpyyes_transaction_event(self):
         """
         Override to return a different EPCPyYes object with custom templates
         for example.
         :return:
         """
-        tevent = template_events.TransactionEvent()
-        return tevent
+        return template_events.TransactionEvent()
 
     def parse_transformation_event_element(
         self,
