@@ -801,7 +801,7 @@ class FlexibleNSParser(EPCISParser):
 
     def parse_object_event_element(self, event, object_element):
         logger.debug('handling object event')
-        oevent = self.get_epcpyyes_object_event(epc_list=[], quantity_list=[])
+        oevent = self.get_epcpyyes_object_event()
         for child in object_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag.endswith('eventTime'):
