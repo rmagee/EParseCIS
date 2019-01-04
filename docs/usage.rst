@@ -518,7 +518,7 @@ Overriding the Base EPCISParser Class
 =====================================
 
 The EParseCIS package provides, essentially, a single class instance
-inside the ``eparsecis`` module that is desgined to be overridin in
+inside the ``eparsecis`` module that is desgined to be overridden in
 order to be useful in any practical sense.
 
 The following methods are provided for use by developers:
