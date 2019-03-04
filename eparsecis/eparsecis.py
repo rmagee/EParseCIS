@@ -817,7 +817,7 @@ class FlexibleNSParser(EPCISParser):
                 oevent.action = child.text.strip()
             elif child.tag.__contains__('bizStep'):
                 oevent.biz_step = child.text.strip()
-            elif child.tag.__contains__('disposition'):
+            elif child.tag.endswith('disposition'):
                 oevent.disposition = child.text.strip()
             elif child.tag.__contains__('readPoint'):
                 self.parse_readpoint(oevent, child)
