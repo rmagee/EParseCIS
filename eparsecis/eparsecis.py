@@ -773,6 +773,7 @@ class FlexibleNSParser(EPCISParser):
     this parser is a little slower due to the fact that it is looking in
     string values as opposed to comparing string values.
     '''
+
     def parse(self, huge_tree=False):
         parser_lookup = etree.ElementDefaultClassLookup(
             element=EPCPyYesElement)
@@ -827,10 +828,21 @@ class FlexibleNSParser(EPCISParser):
                 self.parse_extension(oevent, child)
             elif child.tag.__contains__('baseExtension'):
                 self.parse_base_extension(oevent, child)
+            else:
+                self.parse_unexpected_obj_element(oevent, child)
         logger.debug('clearing out the Element')
         object_element.clear()
         if oevent:
             self.handle_object_event(oevent)
+
+    def parse_unexpected_obj_element(self, oevent, child):
+        """
+        Override to handle any oddness in the XML structure.
+        :param oevent: The object event EPCPyYes object
+        :param child: The unexpected child node
+        :return: None
+        """
+        pass
 
     def parse_aggregation_event_element(self, event, aggregation_element):
         logger.debug('handling aggregation event')
@@ -863,9 +875,20 @@ class FlexibleNSParser(EPCISParser):
                 self.parse_extension(aevent, child)
             elif child.tag.__contains__('baseExtension'):
                 self.parse_base_extension(aevent, child)
+            else:
+                self.parse_unexpected_agg_element(aevent, child)
         logger.debug('clearing out the Element')
         aggregation_element.clear()
         self.handle_aggregation_event(aevent)
+
+    def parse_unexpected_agg_element(self, aevent, child):
+        """
+        Override to handle any unexpected elements.
+        :param aevent: The aggregation epcpyyes event.
+        :param child: The child element from the XML.
+        :return: None.
+        """
+        pass
 
     def parse_transaction_event_element(self, event, transaction_element):
         tevent = None
@@ -899,9 +922,21 @@ class FlexibleNSParser(EPCISParser):
                 self.parse_extension(tevent, child)
             elif child.tag.__contains__('baseExtension'):
                 self.parse_base_extension(tevent, child)
+            else:
+                self.parse_unexpected_xact_element(tevent, child)
         logger.debug('clearing out the Element')
         transaction_element.clear()
         self.handle_transaction_event(tevent)
+
+    def parse_unexpected_xact_element(self, tevent, child):
+        """
+        Override this to handle any weirdness in an event such as
+        vendor specific namespaces, etc.
+        :param tevent: The EPCPyYes transaction event instance.
+        :param child: The element that is unexpected.
+        :return: None
+        """
+        pass
 
     def parse_transformation_event_element(
         self,
@@ -951,6 +986,16 @@ class FlexibleNSParser(EPCISParser):
         transformation_element.clear()
         self.handle_transformation_event(tevent)
 
+    def parse_unexpected_transform_event(self, tevent, child):
+        """
+        Overrride to handle any weirdness in your XML, such as vendor
+        spedific namespaces, etc.
+        :param tevent: The EPCPyYes transformation event instance.
+        :param child: The element that was found.
+        :return: None
+        """
+        pass
+    
     def parse_biz_transaction_list(self, event, list):
         '''
         Parses the business transaction list if supplied in a
