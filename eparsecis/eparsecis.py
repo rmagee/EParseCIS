@@ -572,11 +572,12 @@ class EPCISParser(object):
 
     def parse_ilmd(self, epcis_event, ilmd):
         for child in ilmd:
-            logger.debug('%s,%s', child.tag, child.text.strip())
-            check_val = child.tag.split('}')[1]
-            ilmd = InstanceLotMasterDataAttribute(check_val,
-                                                  child.text.strip())
-            epcis_event.ilmd.append(ilmd)
+            if child.text:
+                logger.debug('%s,%s', child.tag, child.text.strip())
+                check_val = child.tag.split('}')[1]
+                ilmd = InstanceLotMasterDataAttribute(check_val,
+                                                      child.text.strip())
+                epcis_event.ilmd.append(ilmd)
 
     def parse_quantity_list(self, epcis_event, quantity_list):
         '''
@@ -995,7 +996,7 @@ class FlexibleNSParser(EPCISParser):
         :return: None
         """
         pass
-    
+
     def parse_biz_transaction_list(self, event, list):
         '''
         Parses the business transaction list if supplied in a
