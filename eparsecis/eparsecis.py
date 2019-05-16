@@ -269,23 +269,23 @@ class EPCISParser(object):
         for child in aggregation_element:
             logger.debug('%s,%s', child.tag, child.text)
             if child.tag == 'eventTime':
-                aevent.event_time = child.text.strip().strip()
+                aevent.event_time = child.text.strip()
             elif child.tag == 'eventTimeZoneOffset':
                 aevent.event_timezone_offset = child.text.strip()
             elif child.tag == 'bizTransactionList':
                 self.parse_biz_transaction_list(aevent, child)
             elif child.tag == 'recordTime':
-                aevent.record_time = child.text.strip().strip()
+                aevent.record_time = child.text.strip()
             elif child.tag == 'parentID':
-                aevent.parent_id = child.text.strip().strip()
+                aevent.parent_id = child.text.strip()
             elif child.tag == 'childEPCs':
                 self.parse_epc_list(aevent, child)
             elif child.tag == 'action':
-                aevent.action = child.text.strip().strip()
+                aevent.action = child.text.strip()
             elif child.tag == 'bizStep':
-                aevent.biz_step = child.text.strip().strip()
+                aevent.biz_step = child.text.strip()
             elif child.tag == 'disposition':
-                aevent.disposition = child.text.strip().strip()
+                aevent.disposition = child.text.strip()
             elif child.tag == 'readPoint':
                 self.parse_readpoint(aevent, child)
             elif child.tag == 'bizLocation':
@@ -804,33 +804,36 @@ class FlexibleNSParser(EPCISParser):
         logger.debug('handling object event')
         oevent = self.get_epcpyyes_object_event()
         for child in object_element:
-            logger.debug('%s,%s', child.tag, child.text)
-            if child.tag.endswith('eventTime'):
-                oevent.event_time = child.text.strip()
-            elif child.tag.__contains__('bizTransactionList'):
-                self.parse_biz_transaction_list(oevent, child)
-            elif child.tag.__contains__('eventTimeZoneOffset'):
-                oevent.event_timezone_offset = child.text.strip()
-            elif child.tag.__contains__('recordTime'):
-                oevent.record_time = child.text.strip()
-            elif child.tag.__contains__('epcList'):
-                self.parse_epc_list(oevent, child)
-            elif child.tag.__contains__('action'):
-                oevent.action = child.text.strip()
-            elif child.tag.__contains__('bizStep'):
-                oevent.biz_step = child.text.strip()
-            elif child.tag.endswith('disposition'):
-                oevent.disposition = child.text.strip()
-            elif child.tag.__contains__('readPoint'):
-                self.parse_readpoint(oevent, child)
-            elif child.tag.__contains__('bizLocation'):
-                self.parse_biz_location(oevent, child)
-            elif child.tag.__contains__('extension'):
-                self.parse_extension(oevent, child)
-            elif child.tag.__contains__('baseExtension'):
-                self.parse_base_extension(oevent, child)
-            else:
-                self.parse_unexpected_obj_element(oevent, child)
+            try:
+                logger.debug('%s,%s', child.tag, child.text)
+                if child.tag.endswith('eventTime'):
+                    oevent.event_time = child.text.strip()
+                elif child.tag.__contains__('bizTransactionList'):
+                    self.parse_biz_transaction_list(oevent, child)
+                elif child.tag.__contains__('eventTimeZoneOffset'):
+                    oevent.event_timezone_offset = child.text.strip()
+                elif child.tag.__contains__('recordTime'):
+                    oevent.record_time = child.text.strip()
+                elif child.tag.__contains__('epcList'):
+                    self.parse_epc_list(oevent, child)
+                elif child.tag.__contains__('action'):
+                    oevent.action = child.text.strip()
+                elif child.tag.__contains__('bizStep'):
+                    oevent.biz_step = child.text.strip()
+                elif child.tag.endswith('disposition'):
+                    oevent.disposition = child.text.strip()
+                elif child.tag.__contains__('readPoint'):
+                    self.parse_readpoint(oevent, child)
+                elif child.tag.__contains__('bizLocation'):
+                    self.parse_biz_location(oevent, child)
+                elif child.tag.__contains__('extension'):
+                    self.parse_extension(oevent, child)
+                elif child.tag.__contains__('baseExtension'):
+                    self.parse_base_extension(oevent, child)
+                else:
+                    self.parse_unexpected_obj_element(oevent, child)
+            except AttributeError:
+                logger.debug('Found empty element %s', child.tag)
         logger.debug('clearing out the Element')
         object_element.clear()
         if oevent:
@@ -849,35 +852,38 @@ class FlexibleNSParser(EPCISParser):
         logger.debug('handling aggregation event')
         aevent = self.get_epcpyyes_aggregation_event()
         for child in aggregation_element:
-            logger.debug('%s,%s', child.tag, child.text)
-            if child.tag.endswith('eventTime'):
-                aevent.event_time = child.text.strip()
-            elif child.tag.__contains__('eventTimeZoneOffset'):
-                aevent.event_timezone_offset = child.text.strip()
-            elif child.tag.__contains__('bizTransactionList'):
-                self.parse_biz_transaction_list(aevent, child)
-            elif child.tag.__contains__('recordTime'):
-                aevent.record_time = child.text.strip().strip()
-            elif child.tag.__contains__('parentID'):
-                aevent.parent_id = child.text.strip().strip()
-            elif child.tag.__contains__('childEPCs'):
-                self.parse_epc_list(aevent, child)
-            elif child.tag.__contains__('action'):
-                aevent.action = child.text.strip().strip()
-            elif child.tag.__contains__('bizStep'):
-                aevent.biz_step = child.text.strip().strip()
-            elif child.tag.__contains__('disposition'):
-                aevent.disposition = child.text.strip().strip()
-            elif child.tag.__contains__('readPoint'):
-                self.parse_readpoint(aevent, child)
-            elif child.tag.__contains__('bizLocation'):
-                self.parse_biz_location(aevent, child)
-            elif child.tag.__contains__('extension'):
-                self.parse_extension(aevent, child)
-            elif child.tag.__contains__('baseExtension'):
-                self.parse_base_extension(aevent, child)
-            else:
-                self.parse_unexpected_agg_element(aevent, child)
+            try:
+                logger.debug('%s,%s', child.tag, child.text)
+                if child.tag.endswith('eventTime'):
+                    aevent.event_time = child.text.strip()
+                elif child.tag.__contains__('eventTimeZoneOffset'):
+                    aevent.event_timezone_offset = child.text.strip()
+                elif child.tag.__contains__('bizTransactionList'):
+                    self.parse_biz_transaction_list(aevent, child)
+                elif child.tag.__contains__('recordTime'):
+                    aevent.record_time = child.text.strip()
+                elif child.tag.__contains__('parentID'):
+                    aevent.parent_id = child.text.strip()
+                elif child.tag.__contains__('childEPCs'):
+                    self.parse_epc_list(aevent, child)
+                elif child.tag.__contains__('action'):
+                    aevent.action = child.text.strip()
+                elif child.tag.__contains__('bizStep'):
+                    aevent.biz_step = child.text.strip()
+                elif child.tag.__contains__('disposition'):
+                    aevent.disposition = child.text.strip()
+                elif child.tag.__contains__('readPoint'):
+                    self.parse_readpoint(aevent, child)
+                elif child.tag.__contains__('bizLocation'):
+                    self.parse_biz_location(aevent, child)
+                elif child.tag.__contains__('extension'):
+                    self.parse_extension(aevent, child)
+                elif child.tag.__contains__('baseExtension'):
+                    self.parse_base_extension(aevent, child)
+                else:
+                    self.parse_unexpected_agg_element(aevent, child)
+            except AttributeError:
+                logger.debug('Empty element % detected.', child.tag)
         logger.debug('clearing out the Element')
         aggregation_element.clear()
         self.handle_aggregation_event(aevent)
@@ -896,35 +902,38 @@ class FlexibleNSParser(EPCISParser):
         logger.debug('handling transaction event')
         tevent = self.get_epcpyyes_transaction_event()
         for child in transaction_element:
-            logger.debug('%s,%s', child.tag, child.text.strip())
-            if child.tag.endswith('eventTime'):
-                tevent.event_time = child.text.strip()
-            elif child.tag.__contains__('bizTransactionList'):
-                self.parse_biz_transaction_list(tevent, child)
-            elif child.tag.__contains__('eventTimeZoneOffset'):
-                tevent.event_timezone_offset = child.text.strip()
-            elif child.tag.__contains__('recordTime'):
-                tevent.record_time = child.text.strip()
-            elif child.tag.__contains__('parentID'):
-                tevent.parent_id = child.text.strip()
-            elif child.tag.__contains__('epcList'):
-                self.parse_epc_list(tevent, child)
-            elif child.tag.__contains__('action'):
-                tevent.action = child.text.strip()
-            elif child.tag.__contains__('bizStep'):
-                tevent.biz_step = child.text.strip()
-            elif child.tag.__contains__('disposition'):
-                tevent.disposition = child.text.strip()
-            elif child.tag.__contains__('readPoint'):
-                self.parse_readpoint(tevent, child)
-            elif child.tag.__contains__('bizLocation'):
-                self.parse_biz_location(tevent, child)
-            elif child.tag.__contains__('extension'):
-                self.parse_extension(tevent, child)
-            elif child.tag.__contains__('baseExtension'):
-                self.parse_base_extension(tevent, child)
-            else:
-                self.parse_unexpected_xact_element(tevent, child)
+            try:
+                logger.debug('%s,%s', child.tag, child.text.strip())
+                if child.tag.endswith('eventTime'):
+                    tevent.event_time = child.text.strip()
+                elif child.tag.__contains__('bizTransactionList'):
+                    self.parse_biz_transaction_list(tevent, child)
+                elif child.tag.__contains__('eventTimeZoneOffset'):
+                    tevent.event_timezone_offset = child.text.strip()
+                elif child.tag.__contains__('recordTime'):
+                    tevent.record_time = child.text.strip()
+                elif child.tag.__contains__('parentID'):
+                    tevent.parent_id = child.text.strip()
+                elif child.tag.__contains__('epcList'):
+                    self.parse_epc_list(tevent, child)
+                elif child.tag.__contains__('action'):
+                    tevent.action = child.text.strip()
+                elif child.tag.__contains__('bizStep'):
+                    tevent.biz_step = child.text.strip()
+                elif child.tag.__contains__('disposition'):
+                    tevent.disposition = child.text.strip()
+                elif child.tag.__contains__('readPoint'):
+                    self.parse_readpoint(tevent, child)
+                elif child.tag.__contains__('bizLocation'):
+                    self.parse_biz_location(tevent, child)
+                elif child.tag.__contains__('extension'):
+                    self.parse_extension(tevent, child)
+                elif child.tag.__contains__('baseExtension'):
+                    self.parse_base_extension(tevent, child)
+                else:
+                    self.parse_unexpected_xact_element(tevent, child)
+            except AttributeError:
+                logger.debug('Found empty element %s', child.tag)
         logger.debug('clearing out the Element')
         transaction_element.clear()
         self.handle_transaction_event(tevent)
