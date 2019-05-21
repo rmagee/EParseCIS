@@ -574,7 +574,8 @@ class EPCISParser(object):
         for child in ilmd:
             if child.text:
                 logger.debug('%s,%s', child.tag, child.text.strip())
-                check_val = child.tag.split('}')[1]
+                check_val = child.tag.split('}')
+                check_val = check_val[0] if len(check_val) == 1 else check_val[1]
                 ilmd = InstanceLotMasterDataAttribute(check_val,
                                                       child.text.strip())
                 epcis_event.ilmd.append(ilmd)

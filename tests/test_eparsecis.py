@@ -55,6 +55,11 @@ class TestEparsecis(unittest.TestCase):
             os.path.join(curpath, 'data/epcis.xml'))
         parser.parse()
 
+    def test_no_cbv_namespace_file(self):
+        curpath = os.path.dirname(__file__)
+        parser = TestParser(
+            os.path.join(curpath, 'data/no-cbv-namespace.xml'))
+        parser.parse()
 
 if __name__ == '__main__':
     unittest.main()
